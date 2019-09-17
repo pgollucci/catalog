@@ -69,7 +69,12 @@ export const lambdaHandler = async (event: any = {}): Promise<any> => {
     });
     const blob = await getjson(x);
     const typeSystem = new TypeSystem();
-    typeSystem.load('/tmp/package')
-    console.log(typeSystem);
+    typeSystem.load('/tmp/package', {validate: true});
+    console.log(`classes: ${typeSystem.classes}`);
+    console.log(`enums: ${typeSystem.enums}`);
+    console.log(`interfaces: ${typeSystem.interfaces}`);
+    console.log(`methods: ${typeSystem.methods}`);
+    console.log(`properties: ${typeSystem.properties}`);
+    console.log(`roots: ${typeSystem.roots}`);
     return blob.author;
 }

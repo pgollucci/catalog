@@ -1,0 +1,69 @@
+{
+  "name": "@richardhboyd/ddbsizemetric",
+  "version": "0.1.0-alpha.9",
+  "description": "Lambda Custom Resource that emits a metric on the size of your DynamoDB Tables.",
+  "keywords": [
+    "cdk",
+    "constructs",
+    "dynamodb",
+    "lambda"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "jsii",
+    "watch": "jsii -w",
+    "package": "jsii-pacmak -v",
+    "test": "jest ./test",
+    "lint": "tslint 'lib/**/*.ts{,x}'"
+  },
+  "jsii": {
+    "outdir": "../../dist",
+    "targets": {
+      "java": {
+        "package": "dev.rboyd.cdkconstructs.ddbsizemetric",
+        "maven": {
+          "groupId": "dev.rboyd.cdkconstructs",
+          "artifactId": "ddbsizemetric"
+        }
+      },
+      "python": {
+        "distName": "ddbsizemetric",
+        "module": "ddbsizemetric"
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^8.10.52",
+    "@types/nodeunit": "^0.0.30",
+    "jsii": "^0.15.1",
+    "jsii-pacmak": "^0.15.1",
+    "nodeunit": "^0.11.2",
+    "typescript": "^3.3.3333"
+  },
+  "peerDependencies": {
+    "@aws-cdk/aws-events": "^1.5.0",
+    "@aws-cdk/aws-events-targets": "^1.5.0",
+    "@aws-cdk/aws-iam": "^1.5.0",
+    "@aws-cdk/aws-lambda": "^1.5.0",
+    "@aws-cdk/core": "^1.5.0"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-events": "^1.5.0",
+    "@aws-cdk/aws-events-targets": "^1.5.0",
+    "@aws-cdk/aws-iam": "^1.5.0",
+    "@aws-cdk/aws-lambda": "^1.5.0",
+    "@aws-cdk/core": "^1.5.0"
+  },
+  "author": {
+    "name": "Richard Boyd",
+    "email": "Richard@rboyd.dev",
+    "url": "https://www.rboyd.dev"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/ConstructRepo.git",
+    "directory": "packages/DynamoDBPoller"
+  }
+}
