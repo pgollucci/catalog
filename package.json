@@ -1,24 +1,11 @@
 {
-  "name": "cdk_construct_catalog",
-  "version": "0.1.0",
-  "bin": {
-    "cdk_construct_catalog": "bin/cdk_construct_catalog.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "cdk": "cdk"
-  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "name": "CDK-Construct-Catalog",
+  "useWorkspaces": true,
   "devDependencies": {
-    "aws-cdk": "^1.7.0",
-    "ts-node": "^8.1.0",
-    "typescript": "~3.6.2"
-  },
-  "dependencies": {
-    "@aws-cdk/aws-sns": "^1.7.0",
-    "@aws-cdk/aws-sns-subscriptions": "^1.7.0",
-    "@aws-cdk/aws-sqs": "^1.7.0",
-    "@aws-cdk/core": "^1.7.0",
-    "jsii-reflect": "^0.20.4"
+    "lerna": "^3.16.4"
   }
 }
