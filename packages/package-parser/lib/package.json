@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "jsii-reflect": "^0.20.5",
-    "targz": "^1.0.1"
+    "targz": "^1.0.1",
+    "npm": "6.13.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.7",
