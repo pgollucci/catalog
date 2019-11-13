@@ -76,16 +76,16 @@ Next, run the following command to package our Lambda function to S3:
 ```bash
 sam package \
     --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
+    --s3-bucket rhboyd-cdkrepo-public-bucket --profile cdkconstructsrepo
 ```
 
 Next, the following command will create a Cloudformation Stack and deploy your SAM resources.
 
 ```bash
 sam deploy \
-    --template-file packaged.yaml \
-    --stack-name packageparser \
-    --capabilities CAPABILITY_IAM
+--template-file packaged.yaml \
+--stack-name packageparser \
+--capabilities CAPABILITY_IAM --profile cdkconstructsrepo
 ```
 
 > **See [Serverless Application Model (SAM) HOWTO Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-quick-start.html) for more details in how to get started.**
@@ -175,7 +175,7 @@ All commands used throughout this document
 
 ```bash
 # Invoke function locally with event.json as an input
-sam local invoke HelloWorldFunction --event event.json
+npm run build && sam build && sam local invoke HelloWorldFunction --event event.json -n environment.json 
 
 # Run API Gateway locally
 sam local start-api

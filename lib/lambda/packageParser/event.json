@@ -1,5 +1,5 @@
 {
-  "body": "{\"packageName\": \"@richardhboyd/ddbsizemetric\"}",
+  "body": "{\"packageName\": \"@aws-cdk/aws-lambda\"}",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
   "httpMethod": "POST",
