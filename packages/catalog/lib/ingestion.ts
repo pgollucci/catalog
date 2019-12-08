@@ -4,9 +4,11 @@ import lambda = require('@aws-cdk/aws-lambda');
 import events = require('@aws-cdk/aws-events');
 import targets = require('@aws-cdk/aws-events-targets');
 import { NodeFunction } from "./node-function";
+import { PackageStore } from "./storage";
+import ids = require('./ingestion-lambda/ids');
 
 export interface MonitorProps {
-  readonly input: sqs.IQueue;
+  readonly store: PackageStore;
 }
 
 export class Ingestion extends Construct {
@@ -16,7 +18,7 @@ export class Ingestion extends Construct {
     const handler = new NodeFunction(this, 'Timer', {
       codeDirectory: __dirname + '/ingestion-lambda',
       environment: {
-        QUEUE_URL: props.input.queueUrl
+        [ids.Environment.PACKAGE_STORE_TABLE_NAME]: props.store.table.tableName
       }
     });
 
@@ -25,6 +27,6 @@ export class Ingestion extends Construct {
       targets: [ new targets.LambdaFunction(handler) ]
     });
 
-    props.input.grantSendMessages(handler);
+    props.store.table.grantWriteData(handler);
   }
 }

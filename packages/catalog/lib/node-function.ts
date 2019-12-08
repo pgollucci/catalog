@@ -1,7 +1,11 @@
 import lambda = require('@aws-cdk/aws-lambda');
+import os = require('os');
+import child_process = require('child_process');
 import path = require('path');
 import fs = require('fs');
 import iam = require('@aws-cdk/aws-iam');
+import assets_fs = require('@aws-cdk/assets/lib/fs');
+import s3_assets = require('@aws-cdk/aws-s3-assets');
 import sqs = require('@aws-cdk/aws-sqs');
 import ec2 = require('@aws-cdk/aws-ec2');
 import logs = require('@aws-cdk/aws-logs');
@@ -59,13 +63,6 @@ export interface NodeFunctionProps {
   readonly environment?: {
       [key: string]: string;
   };
-
-  /**
-   * The runtime environment for the Lambda function that you are uploading.
-   * For valid values, see the Runtime property in the AWS Lambda Developer
-   * Guide.
-   */
-  readonly runtime?: lambda.Runtime;
 
   /**
    * A name for the function.
@@ -203,20 +200,73 @@ export class NodeFunction extends lambda.Function {
       throw new Error(`Can't find ${props.codeDirectory}`)
     }
 
-    const runtime = props.runtime || lambda.Runtime.NODEJS_12_X;
+    const runtime = discoverNode();
     const timeout = props.timeout || Duration.minutes(1);
-    if (props?.runtime?.family) {
-    // if (props.runtime.family !== lambda.RuntimeFamily.NODEJS) {
+
+    if (runtime.family !== lambda.RuntimeFamily.NODEJS) {
       throw new Error(`Runtime must be a NODEJS runtime`);
     }
 
+    const bundleDir = prepareBundle(props);
+
     super(scope, id, {
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(props.codeDirectory),
+      ...props,
+      handler: renderHandler(props),
+      code: lambda.Code.fromAsset(bundleDir),
       runtime,
       timeout,
-      ...props
     });
+  }
+}
+
+function prepareBundle(props: NodeFunctionProps): string {
+  if (!props.deps || props.deps.length === 0) {
+    return props.codeDirectory;
+  }
+  
+  const bundleDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bundle'));
+
+  assets_fs.copyDirectory(props.codeDirectory, bundleDir, {
+    follow: assets_fs.FollowMode.ALWAYS
+  });
+
+  const bundleModules = `${bundleDir}/node_modules`;
+  fs.mkdirSync(bundleModules);
+
+  for (const dep of props.deps) {
+    copyModule(dep, bundleModules);
+  }
+
+  return bundleDir;
+}
+
+function copyModule(packageName: string, nodeModules: string, source?: string) {
+
+  const packageJson = require.resolve(`${packageName}/package.json`, {
+    paths: source ? [ source ] : undefined
+  });
+
+
+  const packageDir = path.dirname(packageJson);
+  const metadata = require(packageJson);
+
+  const targetDir = `${nodeModules}/${packageName}`;
+
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+
+    assets_fs.copyDirectory(packageDir, targetDir, { 
+      exclude: [ 'node_modules' ] ,
+      follow: assets_fs.FollowMode.ALWAYS
+    });
+  }
+
+  const packageNodeModules = path.join(targetDir, 'node_modules');
+  fs.mkdirSync(packageNodeModules);
+
+  const transitive = metadata.dependencies || {};
+  for (const dep of Object.keys(transitive)) {
+    copyModule(dep, packageNodeModules, packageDir);
   }
 }
 
@@ -227,4 +277,8 @@ function renderHandler(props: NodeFunctionProps): string {
 
   const indexFunction = props.indexFunction || 'handler';
   return `${indexFile}.${indexFunction}`;
+}
+
+function discoverNode() {
+  return lambda.Runtime.NODEJS_10_X;
 }

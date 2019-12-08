@@ -1,10 +1,12 @@
 import http = require('http');
 import aws = require('aws-sdk');
+import ids = require('./ids');
+import common = require('./lambda-common');
 
-const QUEUE_URL = process.env.QUEUE_URL;
-if (!QUEUE_URL) { throw new Error(`QUEUE_URL is required`); }
+const TABLE_NAME = process.env[ids.Environment.PACKAGE_STORE_TABLE_NAME]
+if (!TABLE_NAME) { throw new Error(`TABLE_NAME is required`); }
 
-const sqs = new aws.SQS();
+const dynamodb = new aws.DynamoDB();
 
 interface SearchResult {
   time: string;
@@ -24,10 +26,20 @@ export async function handler() {
     console.log(objects.length, total);
     for (const obj of objects) {
       console.log('obj', obj);
-      await sqs.sendMessage({
-        QueueUrl: QUEUE_URL!,
-        MessageBody: JSON.stringify(obj)
-      }).promise()
+      if (!obj.package) {
+        throw new Error('blow up please');
+      }
+
+      const req: aws.DynamoDB.PutItemInput = {
+        TableName: TABLE_NAME!,
+        Item: {
+          [common.TableAttributes.NAME]: { S: obj.package.name },
+          [common.TableAttributes.VERSION]: { S: obj.package.version },
+          [common.TableAttributes.METADATA]: { S: JSON.stringify(obj.package) },
+        }
+      };
+
+      await dynamodb.putItem(req).promise();
     }
 
     found += objects.length
