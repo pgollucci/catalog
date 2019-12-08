@@ -14,11 +14,7 @@ export class Ingestion extends Construct {
     super(scope, id);
 
     const handler = new NodeFunction(this, 'Timer', {
-      codeDirectory: __dirname + '/lambda',
-      indexFile: 'monitor',
-      runtime: lambda.Runtime.NODEJS_12_X,
-      deps: [ 'aws-sdk' ],
-      timeout: Duration.minutes(10),
+      codeDirectory: __dirname + '/ingestion-lambda',
       environment: {
         QUEUE_URL: props.input.queueUrl
       }

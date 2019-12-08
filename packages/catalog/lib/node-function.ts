@@ -44,7 +44,7 @@ export interface NodeFunctionProps {
    * the function. Because the execution time affects cost, set this value
    * based on the function's expected execution time.
    *
-   * @default Duration.seconds(3)
+   * @default Duration.minutes(1)
    */
   readonly timeout?: Duration;
 
@@ -65,7 +65,7 @@ export interface NodeFunctionProps {
    * For valid values, see the Runtime property in the AWS Lambda Developer
    * Guide.
    */
-  readonly runtime: lambda.Runtime;
+  readonly runtime?: lambda.Runtime;
 
   /**
    * A name for the function.
@@ -203,13 +203,18 @@ export class NodeFunction extends lambda.Function {
       throw new Error(`Can't find ${props.codeDirectory}`)
     }
 
-    if (props.runtime.family !== lambda.RuntimeFamily.NODEJS) {
+    const runtime = props.runtime || lambda.Runtime.NODEJS_12_X;
+    const timeout = props.timeout || Duration.minutes(1);
+    if (props?.runtime?.family) {
+    // if (props.runtime.family !== lambda.RuntimeFamily.NODEJS) {
       throw new Error(`Runtime must be a NODEJS runtime`);
     }
 
     super(scope, id, {
-      handler: renderHandler(props),
+      handler: 'index.handler',
       code: lambda.Code.fromAsset(props.codeDirectory),
+      runtime,
+      timeout,
       ...props
     });
   }
