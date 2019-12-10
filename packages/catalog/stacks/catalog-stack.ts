@@ -1,10 +1,7 @@
-
-import sqs = require('@aws-cdk/aws-sqs');
 import { Stack, Construct, StackProps } from '@aws-cdk/core';
 import { Ingestion } from '../lib/ingestion';
 import { Renderer } from "../lib/renderer";
 import { PackageStore } from '../lib/storage';
-import { DynamoEventSource, SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { Website } from '../lib/website';
 
 export class CatalogStack extends Stack {
@@ -14,16 +11,16 @@ export class CatalogStack extends Stack {
     const website = new Website(this, 'Website');
 
     const store = new PackageStore(this, 'PackageStore', {
-      version: '4'
+      version: '5'
     });
     
-    const monitor = new Ingestion(this, 'Ingestion', {
+    new Ingestion(this, 'Ingestion', {
       store
     });
 
-    const renderer = new Renderer(this, 'Renderer', {
+    new Renderer(this, 'Renderer', {
       bucket: website.bucket,
-      objectPrefix: '',
+      objectPrefix: 'packages/',
       source: store.table
     });
   }

@@ -1,4 +1,4 @@
-import { Construct } from "@aws-cdk/core";
+import { Construct, RemovalPolicy } from "@aws-cdk/core";
 import dynamo = require('@aws-cdk/aws-dynamodb');
 import schema = require('./schema');
 
@@ -24,6 +24,7 @@ export class PackageStore extends Construct {
         name: schema.PackageTableAttributes.VERSION,
       },
       stream: dynamo.StreamViewType.NEW_AND_OLD_IMAGES,
+      removalPolicy: RemovalPolicy.DESTROY
     });
   }
 }

@@ -2,10 +2,9 @@ import http = require('http');
 import aws = require('aws-sdk');
 import ids = require('./ids');
 import schema = require('./schema');
+import { env } from './lambda-util';
 
-const TABLE_NAME = process.env[ids.Environment.PACKAGE_STORE_TABLE_NAME]
-if (!TABLE_NAME) { throw new Error(`TABLE_NAME is required`); }
-
+const TABLE_NAME = env(ids.Environment.PACKAGE_STORE_TABLE_NAME);
 const dynamodb = new aws.DynamoDB();
 
 interface SearchResult {
@@ -31,7 +30,7 @@ export async function handler() {
       }
 
       const req: aws.DynamoDB.PutItemInput = {
-        TableName: TABLE_NAME!,
+        TableName: TABLE_NAME,
         Item: {
           [schema.PackageTableAttributes.NAME]: { S: obj.package.name },
           [schema.PackageTableAttributes.VERSION]: { S: obj.package.version },

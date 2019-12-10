@@ -1,17 +1,14 @@
 import lambda = require('@aws-cdk/aws-lambda');
 import os = require('os');
-import child_process = require('child_process');
 import path = require('path');
 import fs = require('fs');
 import iam = require('@aws-cdk/aws-iam');
-import assets_fs = require('@aws-cdk/assets/lib/fs');
-import s3_assets = require('@aws-cdk/aws-s3-assets');
+import { copyDirectory, FollowMode } from '@aws-cdk/assets/lib/fs';
 import sqs = require('@aws-cdk/aws-sqs');
 import ec2 = require('@aws-cdk/aws-ec2');
 import logs = require('@aws-cdk/aws-logs');
 
 import { Construct, Duration } from '@aws-cdk/core';
-import { pathToFileURL } from 'url';
 
 export interface NodeFunctionProps {
   /**
@@ -41,7 +38,7 @@ export interface NodeFunctionProps {
   /**
    * Dependencies to bundle.
    */
-  readonly deps?: string[];
+  readonly dependencies?: string[];
 
   /**
    * The function execution time (in seconds) after which Lambda terminates
@@ -220,20 +217,20 @@ export class NodeFunction extends lambda.Function {
 }
 
 function prepareBundle(props: NodeFunctionProps): string {
-  if (!props.deps || props.deps.length === 0) {
+  if (!props.dependencies || props.dependencies.length === 0) {
     return props.codeDirectory;
   }
   
   const bundleDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bundle'));
 
-  assets_fs.copyDirectory(props.codeDirectory, bundleDir, {
-    follow: assets_fs.FollowMode.ALWAYS
+  copyDirectory(props.codeDirectory, bundleDir, {
+    follow: FollowMode.ALWAYS
   });
 
   const bundleModules = `${bundleDir}/node_modules`;
   fs.mkdirSync(bundleModules);
 
-  for (const dep of props.deps) {
+  for (const dep of props.dependencies) {
     copyModule(dep, bundleModules);
   }
 
@@ -248,16 +245,16 @@ function copyModule(packageName: string, nodeModules: string, source?: string) {
 
 
   const packageDir = path.dirname(packageJson);
-  const metadata = require(packageJson);
+  const metadata = JSON.parse(fs.readFileSync(packageJson, 'utf-8'));
 
   const targetDir = `${nodeModules}/${packageName}`;
 
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
 
-    assets_fs.copyDirectory(packageDir, targetDir, { 
+    copyDirectory(packageDir, targetDir, { 
       exclude: [ 'node_modules' ] ,
-      follow: assets_fs.FollowMode.ALWAYS
+      follow: FollowMode.ALWAYS
     });
   }
 

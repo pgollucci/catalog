@@ -5,9 +5,10 @@
     "catalog": "bin/catalog.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && yarn lint",
     "watch": "tsc -w",
     "test": "jest",
+    "lint": "eslint --ext .ts .",
     "cdk": "cdk"
   },
   "devDependencies": {
@@ -17,8 +18,11 @@
     "@types/aws-lambda": "^8.10.37",
     "@types/jest": "^24.0.22",
     "@types/node": "10.17.5",
+    "@typescript-eslint/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/parser": "^2.11.0",
     "aws-cdk": "^1.18.0",
     "aws-sdk": "^2.585.0",
+    "eslint": "^6.7.2",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.1.0",
@@ -26,6 +30,8 @@
   },
   "dependencies": {
     "@aws-cdk/aws-certificatemanager": "^1.18.0",
+    "@aws-cdk/aws-ecs": "^1.18.0",
+    "@aws-cdk/aws-ecs-patterns": "^1.18.0",
     "@aws-cdk/aws-iam": "^1.18.0",
     "@aws-cdk/aws-lambda": "^1.18.0",
     "@aws-cdk/aws-lambda-event-sources": "^1.18.0",

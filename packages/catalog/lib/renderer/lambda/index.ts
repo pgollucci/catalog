@@ -1,25 +1,18 @@
 import docgen = require('cdk-docgen');
 import path = require('path');
-import os = require('os');
 import fs = require('fs-extra');
-import child_process = require('child_process');
+import cp = require('child_process');
 import { StreamRecord, SQSEvent } from 'aws-lambda';
 import schema = require('./schema');
 import { promisify } from 'util';
 import ids = require('./ids');
+import { env } from './lambda-util'
 const s3 = require('s3');
 
-const BUCKET_NAME = process.env[ids.Environment.BUCKET_NAME]!;
-if (!BUCKET_NAME) {
-  throw new Error(`${ids.Environment.BUCKET_NAME} is required`);
-}
+const BUCKET_NAME = env(ids.Environment.BUCKET_NAME);
+const OBJECT_PREFIX = env(ids.Environment.OBJECT_PREFIX);
 
-const OBJECT_PREFIX = process.env[ids.Environment.OBJECT_PREFIX]!;
-if (OBJECT_PREFIX === undefined) {
-  throw new Error(`${ids.Environment.OBJECT_PREFIX} is required`);
-}
-
-const exec = promisify(child_process.exec);
+const exec = promisify(cp.exec);
 
 export async function handler(event: SQSEvent) {
   console.log(JSON.stringify(event, undefined, 2));
@@ -40,36 +33,64 @@ export async function handler(event: SQSEvent) {
 
     const name = parseStringValue(record.dynamodb, schema.PackageTableAttributes.NAME);
     const version = parseStringValue(record.dynamodb, schema.PackageTableAttributes.VERSION);
-    const metadata = JSON.parse(parseStringValue(record.dynamodb, schema.PackageTableAttributes.METADATA));
+    // const metadata = parseStringValue(record.dynamodb, schema.PackageTableAttributes.METADATA);
 
     console.log({ name, version });
 
-    const workdir = await fs.mkdtemp(path.join('/tmp', 'renderer-'));
-    console.log({ workdir });
+    await withTempDirectory(async workdir => {
+
+      await exec(`npm install --ignore-scripts ${name}@${version}`, { 
+        cwd: workdir, 
+        env: {
+          ...process.env,
+          HOME: workdir
+        }
+      });
+  
+      const modulesDirectory = path.join(workdir, 'node_modules');
+      const files = await fs.readdir(modulesDirectory);
+      console.log('node_modules:', files.join(','));
+
+      await withTempDirectory(async outdir => {
+
+        const moduleDir = path.join(modulesDirectory, name);
+  
+        // check if the module is a .jsii module. skip otherwise
+        if (!await fs.pathExists(path.join(moduleDir, '.jsii'))) {
+          console.log(`Skipping non-jsii module ${name}@${version}`);
+          return;
+        }
     
-    await exec(`npm install --ignore-scripts ${name}@${version}`, { 
-      cwd: workdir, 
-      env: {
-        ...process.env,
-        HOME: workdir
-      }
+        try {
+          await docgen.renderDocs({
+            modulesDirectory,
+            outdir
+          });  
+        } catch (e) {
+          console.log(`ERROR: unable to render docs for module ${name}@${version}: ${e.stack}`);
+          return;
+        }
+    
+        // upload to s3
+        const sourceDir = path.join(outdir, name);
+        const objectKeyPrefix = path.join(OBJECT_PREFIX, `${name}@${version}/`);
+        console.log({ upload: { source: sourceDir, dest: `${BUCKET_NAME}/${objectKeyPrefix}` }});
+        await uploadDir(sourceDir, BUCKET_NAME, objectKeyPrefix);
+
+      });
+
     });
-    const modulesDirectory = path.join(workdir, 'node_modules');
-    const files = await fs.readdir(modulesDirectory);
-    console.log('node_modules:', files.join(','));
+  }
+}
 
-    const outdir = await fs.mkdtemp(path.join('/tmp', 'renderer-output-'));
-
-    try {
-      await docgen.renderDocs({
-        modulesDirectory,
-        outdir
-      });  
-
-      await uploadDir(path.join(outdir, name), BUCKET_NAME, path.join(OBJECT_PREFIX, `${name}@${version}/`));  
-    } catch (e) {
-      console.error(e);
-    }
+async function withTempDirectory(block: (dir: string) => Promise<void>) {
+  const dir = await fs.mkdtemp(path.join('/tmp', 'renderer-'));
+  console.log(`temp dir: ${dir}`);
+  try {
+    await block(dir);
+  } finally {
+    console.log(`cleaning up: ${dir}`);
+    fs.remove(dir);
   }
 }
 

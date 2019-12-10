@@ -1,7 +1,7 @@
 import { Construct, Duration } from "@aws-cdk/core";
 import sqs = require('@aws-cdk/aws-sqs');
 import dynamo = require('@aws-cdk/aws-dynamodb');
-import event_sources = require('@aws-cdk/aws-lambda-event-sources');
+import sources = require('@aws-cdk/aws-lambda-event-sources');
 import { NodeFunction } from '../util/node-function';
 import ids = require('./lambda/ids');
 import { StartingPosition } from "@aws-cdk/aws-lambda";
@@ -11,6 +11,19 @@ export interface DynamoQueueProps extends sqs.QueueProps {
    * The source DynamoDB table.
    */
   readonly source: dynamo.Table;
+
+  /**
+   * Event types to include (other events will be dropped). Set to `[]` to disable the stream.
+   * 
+   * @default - all event types
+   */
+  readonly events?: EventType[];
+}
+
+export enum EventType {
+  INSERT = 'INSERT',
+  MODIFY = 'MODIFY',
+  REMOVE = 'REMOVE'
 }
 
 /**
@@ -18,23 +31,27 @@ export interface DynamoQueueProps extends sqs.QueueProps {
  */
 export class DynamoQueue extends sqs.Queue {
   constructor(scope: Construct, id: string, props: DynamoQueueProps) {
-    const fifo = props.fifo === undefined ? false : props.fifo;
+    super(scope, id, props);
 
     const visibilityTimeout = props.visibilityTimeout || Duration.seconds(30);
+    const events = props.events || [ EventType.INSERT, EventType.MODIFY, EventType.REMOVE ];
 
-    super(scope, id, props);
+    // do not include any event, so we basically don't need any of this
+    if (events.length === 0) {
+      return;
+    }
 
     const forwarder = new NodeFunction(this, 'Forwarder', {
       codeDirectory: __dirname + '/lambda',
       timeout: visibilityTimeout,
       events: [
-        new event_sources.DynamoEventSource(props.source, {
+        new sources.DynamoEventSource(props.source, {
           startingPosition: StartingPosition.TRIM_HORIZON,
-          batchSize: 1,
         })
       ],
       environment: {
-        [ids.Environment.OUTPUT_QUEUE_URL]: this.queueUrl
+        [ids.Environment.OUTPUT_QUEUE_URL]: this.queueUrl,
+        [ids.Environment.INCLUDE_EVENTS]: Array.from(new Set(events)).join(',')
       }
     });
 

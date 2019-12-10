@@ -1,4 +1,6 @@
 export const enum Environment {
   BUCKET_NAME = 'BUCKET_NAME',
-  OBJECT_PREFIX = 'OBJECT_PREFIX'
-};
+  BUCKET_URL = 'BUCKET_URL',
+  OBJECT_PREFIX = 'OBJECT_PREFIX',
+  TABLE_NAME = 'TABLE_NAME',
+}
