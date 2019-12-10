@@ -10,6 +10,7 @@ interface RendererProps {
   readonly source: dynamo.Table;
   readonly bucket: s3.IBucket;
   readonly objectPrefix?: string;
+  readonly metadataFile: string;
 }
 
 export class Renderer extends Construct {
@@ -27,7 +28,8 @@ export class Renderer extends Construct {
         [ids.Environment.BUCKET_NAME]: props.bucket.bucketName,
         [ids.Environment.BUCKET_URL]: props.bucket.bucketWebsiteUrl,
         [ids.Environment.OBJECT_PREFIX]: props.objectPrefix || '',
-        [ids.Environment.TABLE_NAME]: props.source.tableName
+        [ids.Environment.TABLE_NAME]: props.source.tableName,
+        [ids.Environment.METADATA_FILENAME]: props.metadataFile
       },
     });    
 

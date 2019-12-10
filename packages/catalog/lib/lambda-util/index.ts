@@ -1,7 +1,11 @@
-export function env(name: string): string {
+export function env(name: string, defaultValue?: string): string {
   const value = process.env[name];
   if (!value) {
-    throw new Error(`${name} is required`);
+    if (defaultValue !== undefined) {
+      return defaultValue;
+    } else {
+      throw new Error(`${name} is required`);
+    }
   }
 
   return value;

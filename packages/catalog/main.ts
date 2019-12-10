@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import cdk = require('@aws-cdk/core');
 import { CatalogStack } from './stacks/catalog-stack';
+import { App } from '@aws-cdk/core';
 
-const app = new cdk.App();
-new CatalogStack(app, 'cdk-catalog-2');
+const app = new App();
+new CatalogStack(app, 'cdk-catalog-3');

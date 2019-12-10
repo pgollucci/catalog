@@ -9,7 +9,7 @@ export class Website extends Construct {
 
     this.bucket = new s3.Bucket(this, 'Bucket', {
       websiteIndexDocument: 'index.html',
-      publicReadAccess: true,
+      // publicReadAccess: true,
       removalPolicy: RemovalPolicy.DESTROY
     });
   }
