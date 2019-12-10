@@ -4,7 +4,7 @@ import os = require('os');
 import fs = require('fs-extra');
 import child_process = require('child_process');
 import { StreamRecord, SQSEvent } from 'aws-lambda';
-import schema = require('./lambda-common/packages-table-schema');
+import schema = require('./schema');
 import { promisify } from 'util';
 import ids = require('./ids');
 const s3 = require('s3');
@@ -38,9 +38,9 @@ export async function handler(event: SQSEvent) {
       continue;
     }
 
-    const name = parseStringValue(record.dynamodb, schema.TableAttributes.NAME);
-    const version = parseStringValue(record.dynamodb, schema.TableAttributes.VERSION);
-    const metadata = JSON.parse(parseStringValue(record.dynamodb, schema.TableAttributes.METADATA));
+    const name = parseStringValue(record.dynamodb, schema.PackageTableAttributes.NAME);
+    const version = parseStringValue(record.dynamodb, schema.PackageTableAttributes.VERSION);
+    const metadata = JSON.parse(parseStringValue(record.dynamodb, schema.PackageTableAttributes.METADATA));
 
     console.log({ name, version });
 

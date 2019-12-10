@@ -5,9 +5,7 @@ import { Ingestion } from '../lib/ingestion';
 import { Renderer } from "../lib/renderer";
 import { PackageStore } from '../lib/storage';
 import { DynamoEventSource, SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
-import { StartingPosition } from '@aws-cdk/aws-lambda';
 import { Website } from '../lib/website';
-import { DynamoUpdatesQueue } from '../lib/dynamo-update-queue';
 
 export class CatalogStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {

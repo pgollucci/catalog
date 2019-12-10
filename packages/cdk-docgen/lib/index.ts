@@ -129,7 +129,7 @@ function documentAssembly(render: Rendering, types: AssemblyTypes): AssemblyDoc 
   const serviceName = assemblyShortName(types.assembly);
   const readmeName = `${serviceName}-readme`;
 
-  const renderPage = r => render.typePage(r);
+  const renderPage = (r: jsiiReflect.Type) => render.typePage(r);
 
   const constructs = types.constructs.map(r => render.classPage(r));
 

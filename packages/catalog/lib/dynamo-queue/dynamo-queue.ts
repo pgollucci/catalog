@@ -2,25 +2,30 @@ import { Construct, Duration } from "@aws-cdk/core";
 import sqs = require('@aws-cdk/aws-sqs');
 import dynamo = require('@aws-cdk/aws-dynamodb');
 import event_sources = require('@aws-cdk/aws-lambda-event-sources');
-import { NodeFunction } from "./node-function";
-import ids = require('./forwarder-lambda/ids');
+import { NodeFunction } from '../util/node-function';
+import ids = require('./lambda/ids');
 import { StartingPosition } from "@aws-cdk/aws-lambda";
 
-export interface DynamoUpdatesQueueProps extends sqs.QueueProps {
+export interface DynamoQueueProps extends sqs.QueueProps {
+  /**
+   * The source DynamoDB table.
+   */
   readonly source: dynamo.Table;
 }
 
-export class DynamoUpdatesQueue extends sqs.Queue {
-  constructor(scope: Construct, id: string, props: DynamoUpdatesQueueProps) {
+/**
+ * A queue that is automatically populated with all updates to a DynamoDB table.
+ */
+export class DynamoQueue extends sqs.Queue {
+  constructor(scope: Construct, id: string, props: DynamoQueueProps) {
     const fifo = props.fifo === undefined ? false : props.fifo;
 
     const visibilityTimeout = props.visibilityTimeout || Duration.seconds(30);
 
-
     super(scope, id, props);
 
     const forwarder = new NodeFunction(this, 'Forwarder', {
-      codeDirectory: __dirname + '/forwarder-lambda',
+      codeDirectory: __dirname + '/lambda',
       timeout: visibilityTimeout,
       events: [
         new event_sources.DynamoEventSource(props.source, {
@@ -32,7 +37,6 @@ export class DynamoUpdatesQueue extends sqs.Queue {
         [ids.Environment.OUTPUT_QUEUE_URL]: this.queueUrl
       }
     });
-
 
     this.grantSendMessages(forwarder);
   }

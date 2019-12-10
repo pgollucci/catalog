@@ -1,6 +1,6 @@
 import { Construct } from "@aws-cdk/core";
 import dynamo = require('@aws-cdk/aws-dynamodb');
-import schema = require('./lambda-common/packages-table-schema');
+import schema = require('./schema');
 
 export interface PackageStoreProps {
   version?: string;
@@ -17,11 +17,11 @@ export class PackageStore extends Construct {
     this.table = new dynamo.Table(this, `Table${version}`, {
       partitionKey: {
         type: dynamo.AttributeType.STRING,
-        name: schema.TableAttributes.NAME,
+        name: schema.PackageTableAttributes.NAME,
       },
       sortKey: {
         type: dynamo.AttributeType.STRING,
-        name: schema.TableAttributes.VERSION,
+        name: schema.PackageTableAttributes.VERSION,
       },
       stream: dynamo.StreamViewType.NEW_AND_OLD_IMAGES,
     });

@@ -1,7 +1,7 @@
 import http = require('http');
 import aws = require('aws-sdk');
 import ids = require('./ids');
-import common = require('./lambda-common');
+import schema = require('./schema');
 
 const TABLE_NAME = process.env[ids.Environment.PACKAGE_STORE_TABLE_NAME]
 if (!TABLE_NAME) { throw new Error(`TABLE_NAME is required`); }
@@ -33,9 +33,9 @@ export async function handler() {
       const req: aws.DynamoDB.PutItemInput = {
         TableName: TABLE_NAME!,
         Item: {
-          [common.TableAttributes.NAME]: { S: obj.package.name },
-          [common.TableAttributes.VERSION]: { S: obj.package.version },
-          [common.TableAttributes.METADATA]: { S: JSON.stringify(obj.package) },
+          [schema.PackageTableAttributes.NAME]: { S: obj.package.name },
+          [schema.PackageTableAttributes.VERSION]: { S: obj.package.version },
+          [schema.PackageTableAttributes.METADATA]: { S: JSON.stringify(obj.package) },
         }
       };
 

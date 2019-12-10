@@ -78,7 +78,7 @@
     "@aws-cdk/aws-sns" "1.18.0"
     "@aws-cdk/core" "1.18.0"
 
-"@aws-cdk/aws-certificatemanager@1.18.0":
+"@aws-cdk/aws-certificatemanager@1.18.0", "@aws-cdk/aws-certificatemanager@^1.18.0":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-certificatemanager/-/aws-certificatemanager-1.18.0.tgz#45ad15789fddce5fd55e487811b9bf53b600e81d"
   integrity sha512-JXrXJkw6y0J8wiIBUmhMO4icKyILRBm8r2WPjGcep28oF+FYBQGYbD97R5z/5+NJAdb4r06Bu/cNmgleNR4kTw==
@@ -280,7 +280,7 @@
     "@aws-cdk/aws-iam" "1.18.0"
     "@aws-cdk/core" "1.18.0"
 
-"@aws-cdk/aws-iam@1.18.0":
+"@aws-cdk/aws-iam@1.18.0", "@aws-cdk/aws-iam@^1.18.0":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-iam/-/aws-iam-1.18.0.tgz#f75fe2d33cb25e88f60e14da1a83ee0404515b94"
   integrity sha512-rl+1Oo1S5jZhAAxD1bR9ddBxIajyZ3LDpmGxiU1Y/4ZiwRlv/CKODOfhbNZUC4qHCeDFHUVUOjIYo2PRHRNmCA==
@@ -349,7 +349,7 @@
     "@aws-cdk/aws-iam" "1.18.0"
     "@aws-cdk/core" "1.18.0"
 
-"@aws-cdk/aws-route53-targets@1.18.0":
+"@aws-cdk/aws-route53-targets@1.18.0", "@aws-cdk/aws-route53-targets@^1.18.0":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-route53-targets/-/aws-route53-targets-1.18.0.tgz#24460a52a04b953013e84faea6ee0cc8deeda135"
   integrity sha512-d1sEgZiKWOLvgXgq1rwHnSS79M714z2dUh2QtTOduTVGcd61vC5TWuLBDJ2H4BLzmjEdAINxn5wcJoiHQITjzQ==
@@ -364,7 +364,7 @@
     "@aws-cdk/core" "1.18.0"
     "@aws-cdk/region-info" "1.18.0"
 
-"@aws-cdk/aws-route53@1.18.0":
+"@aws-cdk/aws-route53@1.18.0", "@aws-cdk/aws-route53@^1.18.0":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-route53/-/aws-route53-1.18.0.tgz#97392146c0610a87e0de6037ae1c75dce649c281"
   integrity sha512-v/FiOL6jeRiCGvp0QA5YqVfgocoWF0jUKKOTDaUGOqtXKZ3v01uy/43zqRYhQ7EZZJZhOtEzNkrTLCXn9DMpDw==
@@ -384,6 +384,19 @@
     "@aws-cdk/aws-s3" "1.18.0"
     "@aws-cdk/core" "1.18.0"
     "@aws-cdk/cx-api" "1.18.0"
+
+"@aws-cdk/aws-s3-deployment@^1.18.0":
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-s3-deployment/-/aws-s3-deployment-1.18.0.tgz#b678638449ddfce4941edce48ea6ce677c9be17a"
+  integrity sha512-vKhnxvKSaIXGxSs7Bjby3/tuH2ODT1SgKWAss61yJBbdwHhNxAZ0iPV55OiiUlRSXZ1rHErUNqIzx3Q1905Alg==
+  dependencies:
+    "@aws-cdk/aws-cloudformation" "1.18.0"
+    "@aws-cdk/aws-cloudfront" "1.18.0"
+    "@aws-cdk/aws-iam" "1.18.0"
+    "@aws-cdk/aws-lambda" "1.18.0"
+    "@aws-cdk/aws-s3" "1.18.0"
+    "@aws-cdk/aws-s3-assets" "1.18.0"
+    "@aws-cdk/core" "1.18.0"
 
 "@aws-cdk/aws-s3-notifications@1.18.0":
   version "1.18.0"

@@ -1,12 +1,10 @@
 import { Construct, Duration } from "@aws-cdk/core";
-import { NodeFunction } from "./node-function";
-import { Queue } from "@aws-cdk/aws-sqs";
+import { NodeFunction } from "../util/node-function";
 import s3 = require('@aws-cdk/aws-s3');
-import { IEventSource } from "@aws-cdk/aws-lambda";
-import ids = require('./renderer-lambda/ids');
+import ids = require('./lambda/ids');
 import dynamo = require('@aws-cdk/aws-dynamodb');
 import { SqsEventSource } from "@aws-cdk/aws-lambda-event-sources";
-import { DynamoUpdatesQueue } from "./dynamo-update-queue";
+import { DynamoQueue } from "../dynamo-queue";
 
 interface RendererProps {
   readonly source: dynamo.Table;
@@ -28,7 +26,7 @@ export class Renderer extends Construct {
       timeout: Duration.seconds(30), // TODO: Match to queue timeout
     });
 
-    const queue = new DynamoUpdatesQueue(this, 'UpdateQueue', {
+    const queue = new DynamoQueue(this, 'UpdateQueue', {
       source: props.source
     });
 
