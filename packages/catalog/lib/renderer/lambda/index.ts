@@ -2,49 +2,35 @@ import docgen = require('cdk-docgen');
 import path = require('path');
 import fs = require('fs-extra');
 import cp = require('child_process');
-import { StreamRecord, SQSEvent } from 'aws-lambda';
-import schema = require('./schema');
+import { SQSEvent } from 'aws-lambda';
 import { promisify } from 'util';
 import ids = require('./ids');
-import { env } from './lambda-util'
+import { env, extractPackageStream, toDynamoItem } from './lambda-util'
 import http = require('http');
 import https = require('https');
 import aws = require('aws-sdk');
 
 const s3client = require('s3');
 const s3 = new aws.S3();
+const dynamodb = new aws.DynamoDB();
 
 // improve performance of s3 upload
 // from "Tips" under https://www.npmjs.com/package/s3
 http.globalAgent.maxSockets = https.globalAgent.maxSockets = 20;
 
 const BUCKET_NAME = env(ids.Environment.BUCKET_NAME);
+const BUCKET_URL = env(ids.Environment.BUCKET_URL);
 const OBJECT_PREFIX = env(ids.Environment.OBJECT_PREFIX);
 const METADATA_FILENAME = env(ids.Environment.METADATA_FILENAME);
+const TABLE_NAME = env(ids.Environment.TABLE_NAME);
 
 const exec = promisify(cp.exec);
 
 export async function handler(event: SQSEvent) {
   console.log(JSON.stringify(event, undefined, 2));
 
-  for (const sqsRecord of event.Records) {
-
-    console.log({sqsRecord});
-
-    if (!sqsRecord.body) {
-      continue;
-    }
-
-    const record = JSON.parse(sqsRecord.body) as AWSLambda.DynamoDBRecord;
-    if (!record.dynamodb) {
-      console.log('malformed event body:', JSON.stringify(sqsRecord.body));
-      continue;
-    }
-
-    const name = parseStringValue(record.dynamodb, schema.PackageTableAttributes.NAME);
-    const version = parseStringValue(record.dynamodb, schema.PackageTableAttributes.VERSION);
-    const metadata = parseStringValue(record.dynamodb, schema.PackageTableAttributes.METADATA);
-
+  for (const record of extractPackageStream(event)) {
+    const { name, version } = record;
     console.log({ name, version });
 
     await withTempDirectory(async workdir => {
@@ -88,13 +74,21 @@ export async function handler(event: SQSEvent) {
         await uploadDir(sourceDir, BUCKET_NAME, objectKeyPrefix);
 
         const metadataObjectKey = `${objectKeyPrefix}${METADATA_FILENAME}`;
-        await s3.putObject({
+        const putObject: aws.S3.PutObjectRequest = {
           Bucket: BUCKET_NAME,
           Key: metadataObjectKey,
-          Body: metadata,
+          Body: JSON.stringify(record.metadata),
+        };
+        await s3.putObject(putObject).promise();
+
+        await dynamodb.putItem({
+          TableName: TABLE_NAME,
+          Item: toDynamoItem({
+            ...record,
+            url: `${BUCKET_URL}/${objectKeyPrefix}`
+          })
         }).promise();
       });
-
     });
   }
 }
@@ -124,24 +118,4 @@ async function uploadDir(local: string, bucketName: string, objectKeyPrefix: str
     uploader.once('end', ok);
     uploader.once('error', fail);
   });
-}
-
-function parseStringValue(record: StreamRecord, name: string) {
-  console.log(`parsing field ${name} from ${JSON.stringify(record)}`);
-  const err = `No field ${name} in table record`;
-  if (!record.NewImage) {
-    throw new Error(err);
-  }
-
-  const v = record.NewImage[name];
-  if (!v) {
-    throw new Error(err);
-  }
-
-  const value = v.S;
-  if (!value) {
-    throw new Error(`${err}. Must be a STRING`);
-  }
-
-  return value;
 }

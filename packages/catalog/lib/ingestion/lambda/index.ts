@@ -1,10 +1,9 @@
 import http = require('http');
 import aws = require('aws-sdk');
 import ids = require('./ids');
-import schema = require('./schema');
-import { env } from './lambda-util';
+import { env, toDynamoItem } from './lambda-util';
 
-const TABLE_NAME = env(ids.Environment.PACKAGE_STORE_TABLE_NAME);
+const TABLE_NAME = env(ids.Environment.TABLE_NAME);
 const dynamodb = new aws.DynamoDB();
 
 interface SearchResult {
@@ -29,16 +28,17 @@ export async function handler() {
         throw new Error('blow up please');
       }
 
-      const req: aws.DynamoDB.PutItemInput = {
+      const putItem: aws.DynamoDB.PutItemInput = {
         TableName: TABLE_NAME,
-        Item: {
-          [schema.PackageTableAttributes.NAME]: { S: obj.package.name },
-          [schema.PackageTableAttributes.VERSION]: { S: obj.package.version },
-          [schema.PackageTableAttributes.METADATA]: { S: JSON.stringify(obj.package) },
-        }
+        Item: toDynamoItem({
+          name: obj.package.name,
+          version: obj.package.version,
+          metadata: obj.package
+        })
       };
 
-      await dynamodb.putItem(req).promise();
+      console.log(JSON.stringify({ putItem }, undefined, 2));
+      await dynamodb.putItem(putItem).promise();
     }
 
     found += objects.length
