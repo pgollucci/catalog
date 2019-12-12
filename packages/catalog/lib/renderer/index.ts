@@ -43,7 +43,7 @@ export class Renderer extends Construct {
       dependencies: [ 'cdk-docgen', 'fs-extra', 's3' ],
       environment: {
         [ids.Environment.BUCKET_NAME]: props.website.bucket.bucketName,
-        [ids.Environment.BUCKET_URL]: props.website.bucket.bucketWebsiteUrl,
+        [ids.Environment.BASE_URL]: props.website.baseUrl,
         [ids.Environment.OBJECT_PREFIX]: props.website.packagesObjectPrefix || '',
         [ids.Environment.METADATA_FILENAME]: props.website.metadataFile,
         [ids.Environment.TABLE_NAME]: table.tableName

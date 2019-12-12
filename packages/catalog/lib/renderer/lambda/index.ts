@@ -19,7 +19,7 @@ const dynamodb = new aws.DynamoDB();
 http.globalAgent.maxSockets = https.globalAgent.maxSockets = 20;
 
 const BUCKET_NAME = env(ids.Environment.BUCKET_NAME);
-const BUCKET_URL = env(ids.Environment.BUCKET_URL);
+const BASE_URL = env(ids.Environment.BASE_URL);
 const OBJECT_PREFIX = env(ids.Environment.OBJECT_PREFIX);
 const METADATA_FILENAME = env(ids.Environment.METADATA_FILENAME);
 const TABLE_NAME = env(ids.Environment.TABLE_NAME);
@@ -85,7 +85,7 @@ export async function handler(event: SQSEvent) {
           TableName: TABLE_NAME,
           Item: toDynamoItem({
             ...record,
-            url: `${BUCKET_URL}/${objectKeyPrefix}`
+            url: `${BASE_URL}/${objectKeyPrefix}`
           })
         }).promise();
       });

@@ -5,6 +5,7 @@ export class Website extends Construct {
   public readonly bucket: s3.Bucket;
   public readonly packagesObjectPrefix = 'packages/';
   public readonly metadataFile: string = 'metadata.json';
+  public readonly baseUrl: string = 'https://awscdk.io';
 
   constructor(scope: Construct, id: string) {
     super(scope, id);

@@ -27,6 +27,10 @@ export function toDynamoItem(p: Package): { [key: string]: aws.DynamoDB.Attribut
     output[PackageTableAttributes.URL] = { S: p.url };
   }
   
+  if (p.tweetid) {
+    output[PackageTableAttributes.TWEETID] = { S: p.tweetid };
+  }
+
   return output;
 }
 

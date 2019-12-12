@@ -1,0 +1,4 @@
+export enum Environment {
+  TABLE_NAME = 'TABLE_NAME',
+  TWITTER_SECRET_ARN = 'TWITTER_SECRET_ARN'
+}
