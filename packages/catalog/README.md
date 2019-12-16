@@ -8,13 +8,15 @@ We organize our ingestion process into the following stages:
 INGESTION => RENDERER => INDEXER
 ```
 
-In the **INGESTION** phase, we scan npmjs for all module with the keyword `cdk`
-and publish any new modules to an SNS topic. We use a DynamoDB table to avoid
-duplicated publishing (this implemented by the `DynamoTopic` construct).
+In the **INGESTION** phase, we periodically query npmjs for all module with the
+keyword `cdk` and publish any new modules to an SNS topic. We use a DynamoDB
+table to avoid duplicated publishing (this implemented by the `DynamoTopic`
+construct).
 
-The **RENDERER** subscribes the the aforementioned topic and renders a static
-website for each new modules published to the topic. When done, it publishes to
-another `DynamoTopic`.
+The **RENDERER** subscribes the the aforementioned topic, downloads the module
+from npmjs and renders a static website for the module using `cdk-docgen` (based
+on the module's jsii metadata). When done, it publishes to another
+`DynamoTopic`.
 
 The **INDEXER** subscribes to the renderer's topic and posts a new tweet in the
 catalog Twitter account for each new module. Since Twitter has rate limiting
@@ -22,6 +24,10 @@ catalog Twitter account for each new module. Since Twitter has rate limiting
 We write the tweet ID to a DynamoDB table that will eventually contain all our
 modules with their metadata and the tweet ID associated with them (for reverse
 lookup from module to tweet).
+
+We also have static **FRONTEND** which serves the static pages rendered for each
+module and eventually a search UX that searches for modules in the catalog's
+Twitter account.
 
 ## TODO
 
