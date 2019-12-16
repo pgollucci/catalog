@@ -9,6 +9,7 @@ import sns = require('@aws-cdk/aws-sns');
 import subscriptions = require('@aws-cdk/aws-sns-subscriptions');
 import sqs = require('@aws-cdk/aws-sqs');
 import { DynamoTopic, EventType } from "../util/dynamo-topic";
+import cloudwatch = require('@aws-cdk/aws-cloudwatch');
 
 interface RendererProps {
   readonly input: sns.Topic;
@@ -16,7 +17,15 @@ interface RendererProps {
 }
 
 export class Renderer extends Construct {
+  /**
+   * A topic which receives a notification every time a module is rendered.
+   */
   public readonly topic: sns.Topic;
+
+  /**
+   * Total number of messages rendered every minute.
+   */
+  public readonly renderedPerFiveMinutes: cloudwatch.Metric;
 
   constructor(parent: Construct, id: string, props: RendererProps) {
     super(parent, id);
@@ -58,5 +67,7 @@ export class Renderer extends Construct {
       source: table,
       events: [ EventType.INSERT ]
     });
+
+    this.renderedPerFiveMinutes = this.topic.metricNumberOfMessagesPublished();
   }
 }

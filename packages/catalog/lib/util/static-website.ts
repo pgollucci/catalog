@@ -26,13 +26,13 @@ import {Construct} from '@aws-cdk/core';
 export interface StaticWebsiteProps {
   /**
    * The hosted zone for the static website, e.g. example.com
-   * @default -; required with domainName
+   * @default - required with domainName
    */
   hostedZone?: IHostedZone;
 
   /**
    * The domain name for the static website, e.g. test.example.com
-   * @default -; required with hostedZone
+   * @default - required with hostedZone
    */
   domainName?: string;
 
@@ -67,7 +67,7 @@ export interface StaticWebsiteProps {
 
   /**
    * Default behaviors to apply to the CloudFront distribution.
-   * @default Compression on; GET, HEAD, and OPTIONS allowed methods
+   * @default - Compression on; GET, HEAD, and OPTIONS allowed methods
    */
   behaviors?: Behavior[];
 
@@ -146,9 +146,9 @@ export class StaticWebsite extends Construct {
         ],
       });
 
-    const resolvedindexFile = props.indexFile || 'index.html';
-    if (resolvedindexFile.startsWith('/')) {
-      throw new Error(`Default file cannot start with a /. Got ${resolvedindexFile}`);
+    const indexFile = props.indexFile || 'index.html';
+    if (indexFile.startsWith('/')) {
+      throw new Error(`Default file cannot start with a /. Got ${indexFile}`);
     }
 
     const errorConfigs: CfnDistribution.CustomErrorResponseProperty[] = [];
@@ -160,12 +160,12 @@ export class StaticWebsite extends Construct {
       errorConfigs.push({
         errorCode: 404,
         responseCode: 200,
-        responsePagePath: `/${resolvedindexFile}`,
+        responsePagePath: `/${indexFile}`,
       });
     }
 
     const cloudFrontProps: CloudFrontWebDistributionProps = {
-      defaultRootObject: resolvedindexFile,
+      defaultRootObject: indexFile,
       enableIpV6: true,
       httpVersion: HttpVersion.HTTP2,
       viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

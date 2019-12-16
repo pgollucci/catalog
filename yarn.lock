@@ -89,7 +89,7 @@
     "@aws-cdk/aws-route53" "1.18.0"
     "@aws-cdk/core" "1.18.0"
 
-"@aws-cdk/aws-cloudformation@1.18.0":
+"@aws-cdk/aws-cloudformation@1.18.0", "@aws-cdk/aws-cloudformation@^1.18.0":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-cloudformation/-/aws-cloudformation-1.18.0.tgz#f490e5c439b3328ed2975f3ef861d88526b303b7"
   integrity sha512-cCkz9pZwimlQMlToWwM0r9hlRY1TLi+7LNhbpiKclKbJx6qM/Hbw366CZf7JnKKeM85k/8eEGi54S85fK48fSQ==
@@ -501,7 +501,7 @@
     "@aws-cdk/core" "1.18.0"
     "@aws-cdk/cx-api" "1.18.0"
 
-"@aws-cdk/aws-stepfunctions-tasks@^1.18.0":
+"@aws-cdk/aws-stepfunctions-tasks@1.18.0", "@aws-cdk/aws-stepfunctions-tasks@^1.18.0":
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-stepfunctions-tasks/-/aws-stepfunctions-tasks-1.18.0.tgz#443358a472e453df71d6b38adc7c37eb5db1192a"
   integrity sha512-TDWYkfTnF/gtrD+x0GNCANoCMSUHDnn4MdN+v8ytMpRa9MCzwiBgxcbjTEndfNlliiolEwmZ1Wx3u8jnjMs5Dw==
@@ -558,6 +558,19 @@
   integrity sha512-9/VCu0X/McR/VPpEnFLKQ08Nc6xsjwJEA5LA3yIh6RSnFpIcQhu4IhDcoRG6OXjiOIDXk1rFf1Tu8pHevame6g==
   dependencies:
     "@aws-cdk/cx-api" "1.18.0"
+
+"@aws-cdk/custom-resources@^1.18.0":
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/custom-resources/-/custom-resources-1.18.0.tgz#fe253b6f29e6282380cc010f6a3eaf6b559e6038"
+  integrity sha512-2/S0RlFYPR9KB2Q72ExZHRx9FTadI7GIhyy7UVm0kM1yFfkn6ByFeQWD9VBfZ7PiUFi8yBbIpK80haox+KkYBg==
+  dependencies:
+    "@aws-cdk/aws-cloudformation" "1.18.0"
+    "@aws-cdk/aws-iam" "1.18.0"
+    "@aws-cdk/aws-lambda" "1.18.0"
+    "@aws-cdk/aws-sns" "1.18.0"
+    "@aws-cdk/aws-stepfunctions" "1.18.0"
+    "@aws-cdk/aws-stepfunctions-tasks" "1.18.0"
+    "@aws-cdk/core" "1.18.0"
 
 "@aws-cdk/cx-api@1.18.0":
   version "1.18.0"
@@ -1777,7 +1790,7 @@
     "@types/istanbul-lib-coverage" "*"
     "@types/istanbul-lib-report" "*"
 
-"@types/jest@^24.0.18", "@types/jest@^24.0.22":
+"@types/jest@^24.0.18", "@types/jest@^24.0.23":
   version "24.0.23"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.23.tgz#046f8e2ade026fe831623e361a36b6fb9a4463e4"
   integrity sha512-L7MBvwfNpe7yVPTXLn32df/EK+AMBFAFvZrRuArGs7npEWnlziUXK+5GMIUTI4NIuwok3XibsjXCs5HxviYXjg==
@@ -7876,7 +7889,7 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
 
-ts-jest@^24.1.0:
+ts-jest@^24.2.0:
   version "24.2.0"
   resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-24.2.0.tgz#7abca28c2b4b0a1fdd715cd667d65d047ea4e768"
   integrity sha512-Yc+HLyldlIC9iIK8xEN7tV960Or56N49MDP7hubCZUeI7EbIOTsas6rXCMB4kQjLACJ7eDOF4xWEO5qumpKsag==

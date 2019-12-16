@@ -9,12 +9,19 @@ import ec2 = require('@aws-cdk/aws-ec2');
 import logs = require('@aws-cdk/aws-logs');
 
 import { Construct, Duration } from '@aws-cdk/core';
+import { AssetOptions } from '@aws-cdk/aws-s3-assets';
 
 export interface NodeFunctionProps {
   /**
    * Handler code directory
    */
   readonly codeDirectory: string;
+
+  /**
+   * Options on how to handle the directory asset (for example, how to follow symlinks).
+   */
+  readonly assetOptions?: AssetOptions;
+
   /**
    * A description of the function.
    *
@@ -205,11 +212,12 @@ export class NodeFunction extends lambda.Function {
     }
 
     const bundleDir = prepareBundle(props);
+    const assetOptions = props.assetOptions || { follow: FollowMode.ALWAYS };
 
     super(scope, id, {
       ...props,
       handler: renderHandler(props),
-      code: lambda.Code.fromAsset(bundleDir),
+      code: lambda.Code.fromAsset(bundleDir, assetOptions),
       runtime,
       timeout,
     });

@@ -4,8 +4,8 @@ import Twitter = require('twitter');
 import aws = require('aws-sdk');
 import env = require('../env');
 
-const secretArn = env.prod.twitterCredentialsSecretArn;
-const secrets = new aws.SecretsManager({ region: env.prod.env.region });
+const secretArn = env.dev.twitterCredentialsSecretArn;
+const secrets = new aws.SecretsManager({ region: env.dev.env.region });
 
 async function deleteAll(client: Twitter) {
   while (true) {

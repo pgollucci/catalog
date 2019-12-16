@@ -1,6 +1,7 @@
 import { Construct, Duration, RemovalPolicy } from "@aws-cdk/core";
 import events = require('@aws-cdk/aws-events');
 import targets = require('@aws-cdk/aws-events-targets');
+import cloudwatch = require('@aws-cdk/aws-cloudwatch');
 import { NodeFunction } from "../util/node-function";
 import ids = require('./lambda/ids');
 import dynamo = require('@aws-cdk/aws-dynamodb');
@@ -17,6 +18,7 @@ export interface IngestionProps {
 
 export class Ingestion extends Construct {
   public readonly topic: sns.Topic;
+  public readonly discoveredPerFiveMinutes: cloudwatch.Metric;
 
   constructor(scope: Construct, id: string, props: IngestionProps = {}) {
     super(scope, id);
@@ -46,5 +48,7 @@ export class Ingestion extends Construct {
     });
 
     table.grantWriteData(handler);
+
+    this.discoveredPerFiveMinutes = this.topic.metricNumberOfMessagesPublished();
   }
 }
