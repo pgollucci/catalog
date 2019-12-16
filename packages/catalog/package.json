@@ -1,0 +1,53 @@
+{
+  "name": "catalog",
+  "version": "0.1.0",
+  "bin": {
+    "catalog": "bin/catalog.js"
+  },
+  "scripts": {
+    "build": "tsc && yarn lint",
+    "watch": "tsc -w",
+    "test": "jest",
+    "lint": "eslint --ext .ts .",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "^1.18.0",
+    "@types/aws-lambda": "^8.10.37",
+    "@types/jest": "^24.0.23",
+    "@types/node": "10.17.5",
+    "@types/twitter": "^1.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/parser": "^2.11.0",
+    "aws-cdk": "^1.18.0",
+    "aws-sdk": "^2.585.0",
+    "eslint": "^6.7.2",
+    "jest": "^24.9.0",
+    "ts-node": "^8.1.0",
+    "typescript": "~3.7.2"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-events-targets": "^1.18.0",
+    "@aws-cdk/aws-sqs": "^1.18.0",
+    "@aws-cdk/aws-certificatemanager": "^1.18.0",
+    "@aws-cdk/aws-cloudformation": "^1.18.0",
+    "@aws-cdk/aws-ecs": "^1.18.0",
+    "@aws-cdk/aws-ecs-patterns": "^1.18.0",
+    "@aws-cdk/aws-iam": "^1.18.0",
+    "@aws-cdk/aws-lambda": "^1.18.0",
+    "@aws-cdk/aws-lambda-event-sources": "^1.18.0",
+    "@aws-cdk/aws-route53": "^1.18.0",
+    "@aws-cdk/aws-route53-targets": "^1.18.0",
+    "@aws-cdk/aws-s3-deployment": "^1.18.0",
+    "@aws-cdk/aws-stepfunctions": "^1.18.0",
+    "@aws-cdk/aws-stepfunctions-tasks": "^1.18.0",
+    "@aws-cdk/core": "^1.18.0",
+    "@aws-cdk/custom-resources": "^1.18.0",
+    "@types/fs-extra": "^8.0.1",
+    "cdk-docgen": "0.1.0",
+    "fs-extra": "^8.1.0",
+    "s3": "^4.4.0",
+    "source-map-support": "^0.5.16",
+    "twitter": "^1.7.1"
+  }
+}
