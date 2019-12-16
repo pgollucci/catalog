@@ -13,7 +13,6 @@ export function classPage(klass: jsiiReflect.ClassType, id: string): Document {
     klass.docs.toString(),
     '',
     ...renderImplements(klass),
-    '|---|---',
     ...renderExtends(klass),
     ...renderImplementors(klass),
     ...renderFactories(klass),
@@ -34,7 +33,6 @@ export function interfacePage(iface: jsiiReflect.InterfaceType, id: string): Doc
     `# ${title} ${stability(iface)}`,
     '',
     ...renderImplementors(iface),
-    '|---|---',
     ...renderFactories(iface),
     '',
     iface.docs.toString(),
@@ -51,6 +49,7 @@ function renderImplements(c: jsiiReflect.ClassType) {
 
   return [
     '|**Implements**|' + ifaces.map(x => typeLink(x, typeDocumentationUrl)).join(', '),
+    '|---|---',
   ];
 }
 
@@ -95,6 +94,7 @@ function renderImplementors(i: jsiiReflect.Type) {
 
   return [
     '|**Implemented by**|' + implementors.map(x => typeLink(x, typeDocumentationUrl)).join(', '),
+    '|---|---',
   ];
 }
 
