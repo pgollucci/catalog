@@ -1,6 +1,9 @@
 import { CatalogStackProps } from "./stacks/catalog-stack";
 import { Duration } from "@aws-cdk/core";
 
+/**
+ * Configuration for development stacks. Can be used in any account.
+ */
 export const dev: CatalogStackProps = {
   twitterRateLimit: { quota: 20, window: Duration.minutes(5) },
   env: {
@@ -9,6 +12,10 @@ export const dev: CatalogStackProps = {
   },
 };
 
+/**
+ * Configuration for the production stack, can only be used in the catalog's
+ * production account.
+ */
 export const prod: CatalogStackProps = {
   // https://developer.twitter.com/en/docs/basics/rate-limits
   twitterRateLimit: { quota: 300, window: Duration.hours(3) },

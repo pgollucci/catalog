@@ -3,11 +3,11 @@ import 'source-map-support/register';
 import { CatalogStack } from './stacks/catalog-stack';
 import { App } from '@aws-cdk/core';
 
-import env = require('./env');
+import config = require('./config');
 
 const app = new App();
 
-new CatalogStack(app, 'construct-catalog-prod', env.prod);
-new CatalogStack(app, `construct-catalog-dev-${process.env.USER}`, env.dev)
+new CatalogStack(app, 'construct-catalog-prod', config.prod);
+new CatalogStack(app, `construct-catalog-dev-${process.env.USER}`, config.dev)
 
 app.synth();
