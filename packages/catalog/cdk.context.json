@@ -1,3 +1,7 @@
 {
-  "@aws-cdk/core:enableStackNameDuplicates": "true"
+  "@aws-cdk/core:enableStackNameDuplicates": "true",
+  "hosted-zone:account=499430655523:domainName=awscdk.io:region=us-east-1": {
+    "Id": "/hostedzone/ZFV8L7GM91QXV",
+    "Name": "awscdk.io."
+  }
 }

@@ -15,15 +15,16 @@ import { AtomicCounter } from "../util/atomic-counter";
 import { PolicyStatement } from "@aws-cdk/aws-iam";
 
 export interface IndexerProps {
+  /**
+   * The input topic.
+   */
   readonly input: sns.Topic;
-  readonly twitterCredentials: secrets.ISecret;
 
   /**
-   * Do not actually create tweets. Just log.
-   * 
-   * @default false
+   * Twitter credentials.
+   * @default - do not publish to Twitter
    */
-  readonly dryRun?: boolean;
+  readonly twitterCredentials?: secrets.ISecret;
 
   /**
    * The allowed rate of tweets.
@@ -48,6 +49,8 @@ export interface TweetRate {
 
 export class Indexer extends Construct {
   public readonly tweetsPerFiveMinute: cloudwatch.Metric;
+  public readonly logGroup: string;
+  public readonly table: dynamo.Table;
 
   constructor(scope: Construct, id: string, props: IndexerProps) {
     super(scope, id);
@@ -82,16 +85,13 @@ export class Indexer extends Construct {
 
     const tweets = new sns.Topic(this, 'Tweets');
 
-    const dryRun = props.dryRun === undefined ? false : props.dryRun;
-
     const handler = new NodeFunction(this, 'Function', {
       codeDirectory: __dirname + '/lambda',
       timeout: lambdaTimeout,
       dependencies: [ 'twitter' ],
       environment: {
         [ids.Environment.TABLE_NAME]: table.tableName,
-        [ids.Environment.TWITTER_SECRET_ARN]: props.twitterCredentials.secretArn,
-        [ids.Environment.DRY_RUN]: dryRun ? 'TRUE' : '',
+        [ids.Environment.TWITTER_SECRET_ARN]: props.twitterCredentials?.secretArn ?? '',
         [ids.Environment.TOPIC_ARN]: tweets.topicArn
       },
 
@@ -103,12 +103,14 @@ export class Indexer extends Construct {
     });
 
 
-    props.twitterCredentials.grantRead(handler);
+    props.twitterCredentials?.grantRead(handler);
     table.grantReadWriteData(handler);
     requestQuota.grantDecrement(handler);
     tweets.grantPublish(handler);
 
     this.tweetsPerFiveMinute = tweets.metricNumberOfMessagesPublished();
+    this.logGroup = `/aws/lambda/${handler.functionName}`;
+    this.table = table;
 
     // ------
     // allow main handler and redrive handler to update the event source mapping

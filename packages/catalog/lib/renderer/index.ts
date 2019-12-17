@@ -27,6 +27,11 @@ export class Renderer extends Construct {
    */
   public readonly renderedPerFiveMinutes: cloudwatch.Metric;
 
+  /**
+   * The log group which contains logs for the renderer.
+   */
+  public readonly logGroup: string;
+
   constructor(parent: Construct, id: string, props: RendererProps) {
     super(parent, id);
 
@@ -69,5 +74,6 @@ export class Renderer extends Construct {
     });
 
     this.renderedPerFiveMinutes = this.topic.metricNumberOfMessagesPublished();
+    this.logGroup = `/aws/lambda/${handler.functionName}`;
   }
 }

@@ -1,9 +1,10 @@
-import { extractPackageStream, toDynamoItem } from './lambda-util';
+import { extractPackageStream, toDynamoItem, toDynamoItemKey, fromDynamoItem } from './lambda-util';
 import { env } from './lambda-util';
 import ids = require('./ids');
 import aws = require('aws-sdk');
 import Twitter = require('twitter');
 import atomicCounterClient = require('./client');
+
 
 interface TwitterCredentials {
   consumer_key: string;
@@ -18,8 +19,7 @@ interface PostTweetResponse {
 }
 
 const TABLE_NAME = env(ids.Environment.TABLE_NAME);
-const TWITTER_SECRET_ARN = env(ids.Environment.TWITTER_SECRET_ARN);
-const DRY_RUN = !!env(ids.Environment.DRY_RUN);
+const TWITTER_SECRET_ARN = env(ids.Environment.TWITTER_SECRET_ARN, '');
 const TOPIC_ARN = env(ids.Environment.TOPIC_ARN);
 
 const secrets = new aws.SecretsManager();
@@ -30,24 +30,34 @@ const lambda = new aws.Lambda();
 export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Context) {
   console.log(JSON.stringify(event, undefined, 2));
 
-  const getSecretOutput = await secrets.getSecretValue({
-    SecretId: TWITTER_SECRET_ARN,
-  }).promise();
-  
-  if (!getSecretOutput.SecretString) {
-    throw new Error(`cannot retrieve twitter credentials from secrets manager`);
+  let twitter;
+
+  if (TWITTER_SECRET_ARN) {
+    const getSecretOutput = await secrets.getSecretValue({
+      SecretId: TWITTER_SECRET_ARN,
+    }).promise();
+    
+    if (!getSecretOutput.SecretString) {
+      throw new Error(`cannot retrieve twitter credentials from secrets manager`);
+    }
+
+    const credentials = JSON.parse(getSecretOutput.SecretString) as TwitterCredentials;
+    twitter = new Twitter({
+      ...credentials
+    });
   }
 
-  const credentials = JSON.parse(getSecretOutput.SecretString) as TwitterCredentials;
-  const twitter = new Twitter({
-    ...credentials
-  });
-  
   for (const pkg of extractPackageStream(event)) {
     console.log(JSON.stringify({ record: pkg }, undefined, 2));
 
     if (!pkg.url) {
       throw new Error(`"url" field is expected on all records`);
+    }
+
+    const exists = await getPackage(pkg.name, pkg.version);
+    if (exists) {
+      console.log(`package ${pkg.name}@${pkg.version} already has a tweet with id ${exists.tweetid ?? '<unknown>'}`);
+      continue;
     }
 
     // take a request token by decrementing the quote. if we've reached our
@@ -60,9 +70,15 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     }
     
     const desc = pkg.metadata.description || '';
-    const hashtags = (pkg.metadata.keywords || []).map(k => `#${k}`).join(' ');
+    const hashtags = (pkg.metadata.keywords || []).map(k => `#${k.replace(/-/g, '_')}`).join(' ');
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
-    const status = `${title} ${desc} ${hashtags} ${pkg.url}`
+    const status = [
+      title,
+      pkg.url,
+      '',
+      desc,
+      hashtags
+    ].join('\n')
     console.log(`POST statuses/update ${JSON.stringify({status})}`);
 
     // publish to a topic, so we can monitor and do other stuffs.
@@ -70,7 +86,7 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
 
     let tweetid;
 
-    if (!DRY_RUN) {
+    if (twitter) {
       const resp = await twitter.post('statuses/update', { status }) as PostTweetResponse;
       console.log(JSON.stringify({ tweet: resp }));
       tweetid = resp.id_str;
@@ -89,6 +105,22 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     console.log(JSON.stringify({ putItem }, undefined, 2));
     await dynamodb.putItem(putItem).promise();
   }
+}
+
+async function getPackage(name: string, version: string) {
+  // check if we already have a tweet for this package
+  const getItem: aws.DynamoDB.GetItemInput = {
+    TableName: TABLE_NAME,
+    Key: toDynamoItemKey(name, version)
+  };
+
+  console.log(JSON.stringify({ getItem }, undefined, 2));
+  const resp = await dynamodb.getItem(getItem).promise();
+  if (!resp.Item) {
+    return undefined;
+  }
+
+  return fromDynamoItem(resp.Item);
 }
 
 /**

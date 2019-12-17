@@ -19,6 +19,7 @@ export interface IngestionProps {
 export class Ingestion extends Construct {
   public readonly topic: sns.Topic;
   public readonly discoveredPerFiveMinutes: cloudwatch.Metric;
+  public readonly logGroup: string;
 
   constructor(scope: Construct, id: string, props: IngestionProps = {}) {
     super(scope, id);
@@ -50,5 +51,6 @@ export class Ingestion extends Construct {
     table.grantWriteData(handler);
 
     this.discoveredPerFiveMinutes = this.topic.metricNumberOfMessagesPublished();
+    this.logGroup = `/aws/lambda/${handler.functionName}`;
   }
 }

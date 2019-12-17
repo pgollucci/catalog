@@ -2,7 +2,6 @@ import { App, Stack, Construct, Duration } from '@aws-cdk/core';
 import { AtomicCounter } from '../lib/util/atomic-counter';
 import { Schedule } from '@aws-cdk/aws-events';
 import { NodeFunction } from '../lib/util/node-function';
-import { FollowMode } from '@aws-cdk/assets';
 
 class TestStack extends Stack {
   constructor(scope: Construct, id: string) {

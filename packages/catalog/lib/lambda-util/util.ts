@@ -14,12 +14,18 @@ export function env(name: string, defaultValue?: string): string {
   return value;
 }
 
-export function toDynamoItem(p: Package): { [key: string]: aws.DynamoDB.AttributeValue } {
+export function toDynamoItemKey(name: string, version: string): aws.DynamoDB.AttributeMap {
+  return {
+    [PackageTableAttributes.NAME]: { S: name },
+    [PackageTableAttributes.VERSION]: { S: version },
+  };
+}
+
+export function toDynamoItem(p: Package): aws.DynamoDB.AttributeMap {
   console.log(JSON.stringify({ toDynamoItem: p }, undefined, 2));
 
-  const output: { [key: string]: aws.DynamoDB.AttributeValue } = {
-    [PackageTableAttributes.NAME]: { S: p.name },
-    [PackageTableAttributes.VERSION]: { S: p.version },
+  const output: aws.DynamoDB.AttributeMap = {
+    ...toDynamoItemKey(p.name, p.version),
     [PackageTableAttributes.METADATA]: { S: JSON.stringify(p.metadata) },
   };
 
@@ -32,6 +38,26 @@ export function toDynamoItem(p: Package): { [key: string]: aws.DynamoDB.Attribut
   }
 
   return output;
+}
+
+export function fromDynamoItem(dynamoItem: aws.DynamoDB.AttributeMap): Package {
+
+  const name = dynamoItem[PackageTableAttributes.NAME]?.S;
+  if (!name) { throw new Error(`invalid schema: attribute ${PackageTableAttributes.NAME} is expected`); }
+  
+  const version = dynamoItem[PackageTableAttributes.VERSION]?.S;
+  if (!version) { throw new Error(`invalid schema: attribute ${PackageTableAttributes.VERSION} is expected`); }
+
+  const metadataText = dynamoItem[PackageTableAttributes.METADATA]?.S;
+  if (!metadataText) { throw new Error(`invalid schema: attribute ${PackageTableAttributes.METADATA} is expected`); }
+
+  return {
+    name: name,
+    version: version,
+    metadata: JSON.parse(metadataText),
+    tweetid: dynamoItem[PackageTableAttributes.TWEETID]?.S,
+    url: dynamoItem[PackageTableAttributes.URL]?.S
+  };
 }
 
 export function extractPackageStream(sqsEvent: AWSLambda.SQSEvent): Array<Package> {

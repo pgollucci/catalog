@@ -1,31 +1,38 @@
-import { Stack, Construct, StackProps, Duration } from '@aws-cdk/core';
+import { Stack, Construct, StackProps } from '@aws-cdk/core';
 import { Ingestion } from '../lib/ingestion';
 import { Renderer } from "../lib/renderer";
 import { Website } from '../lib/website';
-import { Indexer } from '../lib/indexer';
+import { Indexer, TweetRate } from '../lib/indexer';
 import secrets = require('@aws-cdk/aws-secretsmanager');
 import { Monitoring } from '../lib/monitoring';
+import { HostedZone } from '@aws-cdk/aws-route53';
 
 export interface CatalogStackProps extends StackProps {
-  readonly twitterCredentialsSecretArn: string;
+  /**
+   * Domain name.
+   */
+  readonly domainName?: string;
 
   /**
-   * Development mode:
-   * 
-   * - Does not post to Twitter (dry run)
-   * - Indexer visibility timeout is 30sec instead of 5min
-   * - Twitter post rate limit: 5 tweets every 1 minute
+   * Twitter credentials.
    */
-  readonly dev?: boolean;
+  readonly twitterSecretArn?: string;
+
+  /**
+   * Tweet rate limiting.
+   */
+  readonly twitterRateLimit: TweetRate;
 }
 
 export class CatalogStack extends Stack {
   constructor(scope: Construct, id: string, props: CatalogStackProps) {
     super(scope, id, { env: props.env });
 
-    const dev = props.dev === undefined ? false : props.dev;
+    const website = new Website(this, 'Website', {
+      domainName: props.domainName,
+      hostedZone: props.domainName ? HostedZone.fromLookup(this, 'HostedZone', { domainName: props.domainName }) : undefined
+    });
 
-    const website = new Website(this, 'Website');
     const ingestion = new Ingestion(this, 'Ingestion');
     
     const renderer = new Renderer(this, 'Renderer', { 
@@ -33,19 +40,23 @@ export class CatalogStack extends Stack {
       website
     });
 
-    const twitterCredentials = secrets.Secret.fromSecretArn(this, 'twitter', props.twitterCredentialsSecretArn);
+    const twitterCredentials = props.twitterSecretArn ? secrets.Secret.fromSecretArn(this, 'twitter', props.twitterSecretArn) : undefined;
 
     const indexer = new Indexer(this, 'Indexer', { 
       input: renderer.topic,
       twitterCredentials,
-      dryRun: dev,
-      rate: dev ? { window: Duration.minutes(5), quota: 20 } : undefined
+      rate: props.twitterRateLimit
     });
 
     new Monitoring(this, 'Monitoring', {
       renderedPerFiveMinutes: renderer.renderedPerFiveMinutes,
       tweetsPerFiveMinutes: indexer.tweetsPerFiveMinute,
-      discoveredPerFiveMinutes: ingestion.discoveredPerFiveMinutes
+      discoveredPerFiveMinutes: ingestion.discoveredPerFiveMinutes,
+      bucket: website.bucket,
+      indexerLogGroup: indexer.logGroup,
+      ingestionLogGroup: ingestion.logGroup,
+      rendererLogGroup: renderer.logGroup,
+      packagesTable: indexer.table
     });
   }
 }

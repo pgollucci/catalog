@@ -7,6 +7,7 @@ import env = require('./env');
 
 const app = new App();
 
-new CatalogStack(app, `dev-${process.env.USER}`, env.dev)
+new CatalogStack(app, 'construct-catalog-prod', env.prod);
+new CatalogStack(app, `construct-catalog-dev-${process.env.USER}`, env.dev)
 
 app.synth();
