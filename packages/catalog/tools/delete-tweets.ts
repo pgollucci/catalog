@@ -1,12 +1,7 @@
+import Twitter = require("twitter");
+import { createTwitterClient } from "./util";
+
 /* eslint-disable */
-
-import Twitter = require('twitter');
-import aws = require('aws-sdk');
-import config = require('../config');
-
-const secretArn = config.prod.twitterSecretArn!;
-const secrets = new aws.SecretsManager({ region: config.prod.env?.region });
-
 async function deleteAll(client: Twitter) {
   while (true) {
     const tweets = await client.get('statuses/user_timeline', {
@@ -26,12 +21,7 @@ async function deleteAll(client: Twitter) {
 }
 
 async function main() {
-  const resp = await secrets.getSecretValue({ SecretId: secretArn }).promise();
-  if (!resp.SecretString) { throw new Error('no secret'); }
-  const credentials = JSON.parse(resp.SecretString);
-
-  const client = new Twitter(credentials);
-
+  const client = await createTwitterClient();
   await deleteAll(client);
 }
 
