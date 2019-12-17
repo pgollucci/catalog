@@ -29,11 +29,12 @@ We also have static **FRONTEND** which serves the static pages rendered for each
 module and eventually a search UX that searches for modules in the catalog's
 Twitter account.
 
-## TODO
+## Roadmap
 
 - [x] **Ingestion**: 
   - [x] Query npm for packages labeled with `cdk`
   - [x] Publish package to an ingestion dynamo topic
+  - [ ] Filter by license
 - [x] **Renderer**: 
   - [x] Process all updates to the ingestion topic through a queue
   - [ ] Skip if we already rendered this module
@@ -50,6 +51,6 @@ Twitter account.
   - [ ] Search box which queries Twitter
   - [ ] Show results
 
-## TODO
+## License
 
-- [ ] Filter by license
+[Apache 2.0](./LICENSE)
