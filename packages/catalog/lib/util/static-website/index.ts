@@ -1,28 +1,11 @@
 // stolen from https://github.com/CaerusKaru/waltersco-shs
-
-// import iam = require('@aws-cdk/aws-iam');
-import {DnsValidatedCertificate} from '@aws-cdk/aws-certificatemanager';
-// import cloudfront = require('@aws-cdk/aws-cloudfront');
-// import lambda = require('@aws-cdk/aws-lambda');
-import {
-  Behavior,
-  CfnCloudFrontOriginAccessIdentity,
-  CfnDistribution,
-  CloudFrontAllowedMethods,
-  CloudFrontWebDistribution,
-  CloudFrontWebDistributionProps,
-  HttpVersion,
-  PriceClass,
-  SourceConfiguration,
-  ViewerProtocolPolicy
-} from '@aws-cdk/aws-cloudfront';
-import {AccountRootPrincipal, CanonicalUserPrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
-import {AaaaRecord, ARecord, IHostedZone, RecordTarget} from '@aws-cdk/aws-route53';
-import {CloudFrontTarget} from '@aws-cdk/aws-route53-targets';
-import {IBucket} from '@aws-cdk/aws-s3';
-import {Construct} from '@aws-cdk/core';
-// import { fingerprint } from '@aws-cdk/assets/lib/fs/fingerprint';
-
+import { Construct } from '@aws-cdk/core';
+import * as certificatemanager from '@aws-cdk/aws-certificatemanager';
+import * as cloudfront from '@aws-cdk/aws-cloudfront';
+import * as iam from '@aws-cdk/aws-iam';
+import * as route53 from '@aws-cdk/aws-route53';
+import * as targets from '@aws-cdk/aws-route53-targets';
+import * as s3 from '@aws-cdk/aws-s3';
 
 /**
  * Properties to configure the static website construct.
@@ -31,13 +14,13 @@ export interface StaticWebsiteProps {
   /**
    * The bucket that contains the static website contents.
    */
-  readonly bucket: IBucket;
+  readonly bucket: s3.IBucket;
 
   /**
    * The hosted zone for the static website, e.g. example.com
    * @default - required with domainName
    */
-  readonly hostedZone?: IHostedZone;
+  readonly hostedZone?: route53.IHostedZone;
 
   /**
    * The domain name for the static website, e.g. test.example.com
@@ -70,26 +53,26 @@ export interface StaticWebsiteProps {
    * Source configurations to set for the CloudFront distribution.
    * @default - A default source configuration is always added
    */
-  readonly sourceConfigs?: SourceConfiguration[];
+  readonly sourceConfigs?: cloudfront.SourceConfiguration[];
 
   /**
    * Error configurations to set for the CloudFront distribution.
    * @default none, unless spa also set to true
    */
-  readonly errorConfigs?: CfnDistribution.CustomErrorResponseProperty[];
+  readonly errorConfigs?: cloudfront.CfnDistribution.CustomErrorResponseProperty[];
 
   /**
    * Default behaviors to apply to the CloudFront distribution.
    * @default - Compression on; GET, HEAD, and OPTIONS allowed methods
    */
-  readonly behaviors?: Behavior[];
+  readonly behaviors?: cloudfront.Behavior[];
 
   /**
    * The price class for the CLoudFront distribution.
    * @default price class 100
    * @see https://aws.amazon.com/cloudfront/pricing/
    */
-  readonly priceClass?: PriceClass;
+  readonly priceClass?: cloudfront.PriceClass;
 }
 
 /**
@@ -99,84 +82,55 @@ export interface StaticWebsiteProps {
  */
 export class StaticWebsite extends Construct {
   public static readonly DEFAULT_FILE_EXTENSIONS = [ '.html', '.htm', '.md', '.css', '.js', '.aspx', '.php', '.dhtml', '.htmls', '.json', '.jsp', '.jspx', '.php3', '.pdf', '.png', '.gif', '.tiff', '.zip', '.gz', '.wsdl', '.tiff', '.bmp', '.svg', '.jpg', '.jpeg', '.mkv', '.avi', '.txt' ];
-  public readonly distribution: CloudFrontWebDistribution;
+  public readonly distribution: cloudfront.CloudFrontWebDistribution;
 
   constructor(scope: Construct, name: string, props: StaticWebsiteProps) {
     super(scope, name);
 
-    const originAccessIdentity = new CfnCloudFrontOriginAccessIdentity(this, 'OAI', {
-      cloudFrontOriginAccessIdentityConfig: {
-        comment: 'OAI'
-      }
-    });
-    const s3UserId = originAccessIdentity.attrS3CanonicalUserId;
+    const originAccessIdentity = new cloudfront.OriginAccessIdentity(this, 'OAI');
+    const s3UserId = originAccessIdentity.cloudFrontOriginAccessIdentityS3CanonicalUserId;
 
     const bucket = props.bucket;
 
-    bucket.grantRead(new CanonicalUserPrincipal(s3UserId));
+    bucket.grantRead(new iam.CanonicalUserPrincipal(s3UserId));
     bucket.addToResourcePolicy(
-      new PolicyStatement({
+      new iam.PolicyStatement({
         actions: ['s3:ListBucket'],
-        principals: [new CanonicalUserPrincipal(s3UserId)],
+        principals: [new iam.CanonicalUserPrincipal(s3UserId)],
         resources: [bucket.bucketArn]
       })
     );
     bucket.addToResourcePolicy(
-      new PolicyStatement({
+      new iam.PolicyStatement({
         actions: ['s3:*'],
-        principals: [new AccountRootPrincipal()],
+        principals: [new iam.AccountRootPrincipal()],
         resources: [bucket.arnForObjects('*')]
       })
     );
 
-    // const urlRewriterDir = __dirname + '/url-rewriter';
-    // const urlRewriter = new lambda.Function(this, 'UrlRewriter', {
-    //   runtime: lambda.Runtime.NODEJS_8_10,
-    //   handler: 'index.handler',
-    //   code: lambda.Code.fromAsset(urlRewriterDir)
-    // });
-
-    // if (!(urlRewriter.role instanceof iam.Role)) {
-    //   throw new Error('assertion failed');
-    // }
-
-    // urlRewriter.role.assumeRolePolicy?.addStatements(new PolicyStatement({
-    //   actions: [ 'sts:AssumeRole' ],
-    //   principals: [ new iam.ServicePrincipal('edgelambda.amazonaws.com') ]
-    // }));
-
-    // const urlRewriterHash = fingerprint(urlRewriterDir);
-    // const urlRewriterVersion = urlRewriter.addVersion(urlRewriterHash);
-
-    const sourceConfigs: SourceConfiguration[] = (props.sourceConfigs || [])
-      .map((config: SourceConfiguration) => {
+    const sourceConfigs: cloudfront.SourceConfiguration[] = (props.sourceConfigs || [])
+      .map((config: cloudfront.SourceConfiguration) => {
         const fixedConfig = {...config};
         if (!fixedConfig.s3OriginSource && !fixedConfig.customOriginSource) {
-          fixedConfig.s3OriginSource = {
-            originAccessIdentityId: originAccessIdentity.ref,
+          fixedConfig.s3OriginSource = {            
+            originAccessIdentity,
             s3BucketSource: bucket,
           };
           fixedConfig.originPath = config.originPath;
         }
-        return fixedConfig as SourceConfiguration;
+        return fixedConfig as cloudfront.SourceConfiguration;
       });
 
     sourceConfigs.push({
       s3OriginSource: {
-        originAccessIdentityId: originAccessIdentity.ref,
+        originAccessIdentity: originAccessIdentity,
         s3BucketSource: bucket
       },
       behaviors: props.behaviors ? props.behaviors : [
         {
           isDefaultBehavior: true,
-          allowedMethods: CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
+          allowedMethods: cloudfront.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
           compress: true,
-          // lambdaFunctionAssociations: [
-          //   {
-          //     eventType: cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
-          //     lambdaFunction: urlRewriterVersion
-          //   }
-          // ]
         }
       ],
     });
@@ -186,7 +140,7 @@ export class StaticWebsite extends Construct {
       throw new Error(`Default file cannot start with a /. Got ${indexFile}`);
     }
 
-    const errorConfigs: CfnDistribution.CustomErrorResponseProperty[] = [];
+    const errorConfigs: cloudfront.CfnDistribution.CustomErrorResponseProperty[] = [];
     if (props.errorConfigs) {
       errorConfigs.push(...props.errorConfigs);
     }
@@ -199,24 +153,24 @@ export class StaticWebsite extends Construct {
       });
     }
 
-    const cloudFrontProps: CloudFrontWebDistributionProps = {
+    const cloudFrontProps: cloudfront.CloudFrontWebDistributionProps = {
       defaultRootObject: indexFile,
       enableIpV6: true,
-      httpVersion: HttpVersion.HTTP2,
-      viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      priceClass: props.priceClass || PriceClass.PRICE_CLASS_100,
+      httpVersion: cloudfront.HttpVersion.HTTP2,
+      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      priceClass: props.priceClass || cloudfront.PriceClass.PRICE_CLASS_100,
       originConfigs: sourceConfigs,
       errorConfigurations: errorConfigs,
     };
 
     if (props.hostedZone && props.domainName) {
-      const certificate = new DnsValidatedCertificate(this, 'Certificate', {
+      const certificate = new certificatemanager.DnsValidatedCertificate(this, 'Certificate', {
         domainName: props.domainName,
         hostedZone: props.hostedZone,
         region: 'us-east-1',
       });
 
-      this.distribution = new CloudFrontWebDistribution(this, 'SWCFDistribution', {
+      this.distribution = new cloudfront.CloudFrontWebDistribution(this, 'SWCFDistribution', {
         ...cloudFrontProps,
         aliasConfiguration: {
           acmCertRef: certificate.certificateArn,
@@ -224,19 +178,19 @@ export class StaticWebsite extends Construct {
         },
       });
 
-      new ARecord(this, 'Record', {
+      new route53.ARecord(this, 'Record', {
         recordName: props.domainName,
-        target: RecordTarget.fromAlias(new CloudFrontTarget(this.distribution)),
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(this.distribution)),
         zone: props.hostedZone
       });
 
-      new AaaaRecord(this, 'AAAARecord', {
+      new route53.AaaaRecord(this, 'AAAARecord', {
         recordName: props.domainName,
-        target: RecordTarget.fromAlias(new CloudFrontTarget(this.distribution)),
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(this.distribution)),
         zone: props.hostedZone
       });
     } else {
-      this.distribution = new CloudFrontWebDistribution(this, 'SWCFDistribution', cloudFrontProps);
+      this.distribution = new cloudfront.CloudFrontWebDistribution(this, 'SWCFDistribution', cloudFrontProps);
     }
   }
 }
