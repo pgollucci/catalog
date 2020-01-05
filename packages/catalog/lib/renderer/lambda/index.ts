@@ -4,8 +4,8 @@ import fs = require('fs-extra');
 import cp = require('child_process');
 import { SQSEvent } from 'aws-lambda';
 import { promisify } from 'util';
+import { env, extractPackageStream, toDynamoItem } from './lambda-util';
 import ids = require('./ids');
-import { env, extractPackageStream, toDynamoItem } from './lambda-util'
 import http = require('http');
 import https = require('https');
 import aws = require('aws-sdk');
@@ -35,13 +35,13 @@ export async function handler(event: SQSEvent) {
 
     await withTempDirectory(async workdir => {
 
-      await exec(`npm install --ignore-scripts ${name}@${version}`, { 
-        cwd: workdir, 
-        env: {
-          ...process.env,
-          HOME: workdir
-        }
-      });
+      await npmInstall(`${name}@${version}`, { cwd: workdir });
+
+      // if @aws-cdk/core is not installed, install it manually
+      if (!(await fs.pathExists(path.join(workdir, 'node_modules', '@aws-cdk', 'core')))) {
+        console.log(`@aws-cdk/core module does not exist, installing manually (e.g. cdk-constants)`);
+        await npmInstall(`@aws-cdk/core`, { cwd: workdir });
+      }
   
       const modulesDirectory = path.join(workdir, 'node_modules');
       const files = await fs.readdir(modulesDirectory);
@@ -117,5 +117,15 @@ async function uploadDir(local: string, bucketName: string, objectKeyPrefix: str
   return new Promise((ok, fail) => {
     uploader.once('end', ok);
     uploader.once('error', fail);
+  });
+}
+
+async function npmInstall(module: string, options: { cwd: string }) {
+  await exec(`npm install --ignore-scripts ${module}`, { 
+    cwd: options.cwd, 
+    env: {
+      ...process.env,
+      HOME: options.cwd
+    }
   });
 }
