@@ -12,7 +12,7 @@ At the moment, you can simply use Twitter to search the catalog. Simply include 
 
 The Construct Catalog will automatically discover jsii multi-language modules published to npm with the `cdk` keyword:
 
-1. Follow the instructions in [jsii/jsii](https://github.com/aws/jsii) on how to create a jsii module.
+1. Follow the instructions in [jsii/README](https://github.com/aws/jsii) on how to create a jsii module.
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
 3. Publish your module to all package managers. You can use [aws-delivlib](https://github.com/awslabs/aws-delivlib) to define your multi-language release pipeline. This is the same tech we use to publish the AWS CDK to all package managers.
 
