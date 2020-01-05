@@ -2,7 +2,7 @@
 
 The **CDK Construct Catalog** (https://awscdk.io) is an index of multi-language AWS CDK libraries. 
 
-The services watches [npmjs](npmjs.com) and every time it discovers a new npm [jsii module](https://github.com/aws/jsii) with the keyword `cdk`, it will automatically render a reference documentation web page for it and tweet about it through the [@awscdkio](https://twitter.com/awscdkio) handle. For example, see the page for [cdk-secrets@0.4.1](https://awscdk.io/packages/cdk-secrets@0.4.1) and it's corresponding [tweet](https://twitter.com/awscdkio/status/1211268176274694145).
+The service watches [npmjs](npmjs.com) and every time it discovers a new npm [jsii module](https://github.com/aws/jsii) with the keyword `cdk`, it will automatically render a reference documentation web page for it and tweet about it through the [@awscdkio](https://twitter.com/awscdkio) handle. For example, see the page for [cdk-secrets@0.4.1](https://awscdk.io/packages/cdk-secrets@0.4.1) and it's corresponding [tweet](https://twitter.com/awscdkio/status/1211268176274694145).
 
 ## Searching for modules
 
