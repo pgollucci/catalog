@@ -15,12 +15,13 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 1. Follow the instructions in [jsii/README](https://github.com/aws/jsii) on how to create a jsii module.
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
 3. Publish your module to all package managers. You can use [aws-delivlib](https://github.com/awslabs/aws-delivlib) to define your multi-language release pipeline. This is the same tech we use to publish the AWS CDK to all package managers.
+4. Wait up to 10 minutes. If you don't see a Tweet by @awscdkio about your new version, raise an [issue](https://github.com/construct-catalog/catalog/issues/new).
 
 Here are some examples for modules: [cdk-secrets](https://github.com/udondan/cdk-secrets), [cdk-watchful](https://github.com/eladb/cdk-watchful), [cdk-dynamo-table-viewer](https://github.com/eladb/cdk-dynamo-table-viewer).
 
 ## Contributing to this project
 
-This is the source code repository for the Construct Catalog (https://awscdk.io). Contributions are more than welcome!
+This is the source code repository for the Construct Catalog (https://awscdk.io). **Contributions are more than welcome!**
 
 This repo includes multiple packages:
 
