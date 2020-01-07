@@ -2,6 +2,8 @@
 
 The **CDK Construct Catalog** (https://awscdk.io) is an index of multi-language AWS CDK libraries. 
 
+> This is a community project and is not officially supported by AWS.
+
 The service watches [npmjs](npmjs.com) and every time it discovers a new npm [jsii module](https://github.com/aws/jsii) with the keyword `cdk`, it will automatically render a reference documentation web page for it and tweet about it through the [@awscdkio](https://twitter.com/awscdkio) handle. For example, see the page for [cdk-secrets@0.4.1](https://awscdk.io/packages/cdk-secrets@0.4.1) and it's corresponding [tweet](https://twitter.com/awscdkio/status/1211268176274694145).
 
 ## Searching for modules
@@ -15,9 +17,18 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 1. Follow the instructions in [jsii/README](https://github.com/aws/jsii) on how to create a jsii module.
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
 3. Publish your module to all package managers. You can use [aws-delivlib](https://github.com/awslabs/aws-delivlib) to define your multi-language release pipeline. This is the same tech we use to publish the AWS CDK to all package managers.
-4. Wait up to 10 minutes. If you don't see a Tweet by @awscdkio about your new version, raise an [issue](https://github.com/construct-catalog/catalog/issues/new).
+4. If your module is not picked up by @awscdkio within 10 minutes, see the troubleshooting section below.
 
 Here are some examples for modules: [cdk-secrets](https://github.com/udondan/cdk-secrets), [cdk-watchful](https://github.com/eladb/cdk-watchful), [cdk-dynamo-table-viewer](https://github.com/eladb/cdk-dynamo-table-viewer).
+
+**Troubleshooting**
+
+For some reason, my module doesn't get picked up by @awscdkio. Here are some common issues:
+
+- Make sure your module has the `cdk` keyword in `package.json`
+- Make sure your npm tarball contains the `.jsii` metadata file (`npm install` and check if `node_modules/MODULE/.jsii` exists).
+- Make sure your module's latest version appears in `npm search MODULE`.
+- If all else fails, raise an [issue](https://github.com/construct-catalog/catalog/issues/new). It could very well be a bug in the catalog.
 
 ## Contributing to this project
 
