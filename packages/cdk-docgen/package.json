@@ -25,11 +25,11 @@
     "fs-extra": "^8.1.0",
     "glob-promise": "^3.4.0",
     "glob": "^7.1.6",
-    "jsii-reflect": "^0.20.11",
+    "jsii-reflect": "^0.21.1",
     "jsii-spec": "^0.20.11",
     "showdown-highlight": "^2.1.3",
     "yaml": "^1.7.2",
-    "yargs": "^15.0.2"
+    "yargs": "^15.1.0"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -44,12 +44,12 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
-    "@types/jest": "^24.0.23",
+    "@types/jest": "^24.0.25",
     "@types/yaml": "^1.2.0",
-    "@types/yargs": "^13.0.3",
+    "@types/yargs": "^15.0.0",
     "jest": "^24.9.0",
-    "jsii": "^0.20.11",
-    "typescript": "^3.7.3"
+    "jsii": "^0.21.1",
+    "typescript": "^3.7.4"
   },
   "keywords": [
     "cdk"
