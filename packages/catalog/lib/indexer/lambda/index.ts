@@ -73,8 +73,8 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     const hashtags = (pkg.metadata.keywords || []).map(k => `#${k.replace(/-/g, '_')}`).join(' ');
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
 
-    // extract twitter handle from package.json/author field (if exists)
-    let twitterHandle = pkg.json.author?.twitter;
+    // extract twitter handle from package.json/awscdkio.twitter field (if exists)
+    let twitterHandle = pkg.json.awscdkio?.twitter;
     if (twitterHandle && !twitterHandle.startsWith('@')) {
       twitterHandle = '@' + twitterHandle;
     }
