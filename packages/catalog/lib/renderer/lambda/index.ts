@@ -56,6 +56,9 @@ export async function handler(event: SQSEvent) {
           console.log(`Skipping non-jsii module ${name}@${version}`);
           return;
         }
+
+        // store package.json
+        const packageJson = await fs.readFile(path.join(moduleDir, 'package.json'), 'utf-8');
     
         try {
           await docgen.renderDocs({
@@ -85,6 +88,7 @@ export async function handler(event: SQSEvent) {
           TableName: TABLE_NAME,
           Item: toDynamoItem({
             ...record,
+            json: packageJson,
             url: `${BASE_URL}/${objectKeyPrefix}`
           })
         }).promise();

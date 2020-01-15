@@ -72,11 +72,14 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     const desc = pkg.metadata.description || '';
     const hashtags = (pkg.metadata.keywords || []).map(k => `#${k.replace(/-/g, '_')}`).join(' ');
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
-    let twitterHandle = pkg.metadata.author?.twitter;
+
+    // extract twitter handle from package.json/author field (if exists)
+    let twitterHandle = pkg.json.author?.twitter;
     if (twitterHandle && !twitterHandle.startsWith('@')) {
-      twitterHandle = "@" + twitterHandle;
+      twitterHandle = '@' + twitterHandle;
     }
     const author = twitterHandle ? `by ${twitterHandle}` : '';
+
     const status = [
       title,
       pkg.url,
@@ -84,7 +87,8 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
       desc,
       author,
       hashtags,
-    ].join('\n')
+    ].join('\n');
+
     console.log(`POST statuses/update ${JSON.stringify({status})}`);
 
     // publish to a topic, so we can monitor and do other stuffs.

@@ -37,6 +37,10 @@ export function toDynamoItem(p: Package): aws.DynamoDB.AttributeMap {
     output[PackageTableAttributes.TWEETID] = { S: p.tweetid };
   }
 
+  if (p.json) {
+    output[PackageTableAttributes.JSON] = { S: JSON.stringify(p.json) };
+  }
+
   return output;
 }
 
@@ -56,7 +60,8 @@ export function fromDynamoItem(dynamoItem: aws.DynamoDB.AttributeMap): Package {
     version: version,
     metadata: JSON.parse(metadataText),
     tweetid: dynamoItem[PackageTableAttributes.TWEETID]?.S,
-    url: dynamoItem[PackageTableAttributes.URL]?.S
+    url: dynamoItem[PackageTableAttributes.URL]?.S,
+    json: dynamoItem[PackageTableAttributes.JSON]?.S,
   };
 }
 
@@ -89,7 +94,8 @@ export function extractPackageStream(sqsEvent: AWSLambda.SQSEvent): Array<Packag
       name: parseStringValue(record.dynamodb, PackageTableAttributes.NAME),
       version: parseStringValue(record.dynamodb, PackageTableAttributes.VERSION),
       metadata: JSON.parse(parseStringValue(record.dynamodb, PackageTableAttributes.METADATA)),
-      url: parseOptionStringValue(record.dynamodb, PackageTableAttributes.URL)
+      url: parseOptionStringValue(record.dynamodb, PackageTableAttributes.URL),
+      json: JSON.parse(parseStringValue(record.dynamodb, PackageTableAttributes.JSON))
     });
   }
 

@@ -3,13 +3,15 @@ export const enum PackageTableAttributes {
   VERSION = 'version',
   METADATA = 'metadata',
   URL = 'url',
-  TWEETID = 'tweetid'
+  TWEETID = 'tweetid',
+  JSON = 'json'
 }
 
 export interface Package {
   name: string;
   version: string;
   metadata: PackageMetadata;
+  json?: any; // contents of package.json (only available after rendering)
   url?: string;
   tweetid?: string;
 }
