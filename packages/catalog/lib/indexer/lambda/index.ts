@@ -74,7 +74,7 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
     let twitterHandle = pkg.metadata.author?.twitter;
     if (twitterHandle && !twitterHandle.startsWith('@')) {
-      twitterHandle = "@" +twitterHandletwitter;
+      twitterHandle = "@" + twitterHandle;
     }
     const author = twitterHandle ? `by ${twitterHandle}` : '';
     const status = [
