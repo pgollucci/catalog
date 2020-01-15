@@ -30,4 +30,4 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         cd packages/catalog
-        cdk deploy "*"
+        npx cdk deploy --require-approval=never "*"
