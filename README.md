@@ -41,6 +41,38 @@ This repo includes multiple packages:
 
 Check out our [issue list](https://github.com/construct-catalog/catalog/issues) for ideas for contributions.
 
+### Development Environment
+
+#### Getting started
+
+1. Clone the project and `cd` into its root directory.
+2. `yarn install`
+3. `npx lerna run build`
+
+#### Building the catalog
+
+1. Follow the **Getting started** instructions.
+2. `cd ./packages/catalog`
+3. `cdk bootstrap`
+4. `cdk deploy`
+5. Determine the CloudFront Distribution **Domain Name** for your CDK Construct Catalog deployment (e.g. `dxxxxxxxxxxxxx.cloudfront.net`), which can be found in your list of [Cloudfront Distributions](https://console.aws.amazon.com/cloudfront/home). Look for the one with an **Origin** value beginning with `construct-catalog-dev`.
+    * If you have the AWS CLI installed, you can find the **Domain Name** by running this command:
+      ```bash
+      aws cloudfront list-distributions \
+          --query "DistributionList.Items[].{DomainName: DomainName, Origin: Origins.Items[].DomainName | [0]}
+                   [?starts_with(Origin, 'construct-catalog-dev')].DomainName" \
+          --output text
+      ```
+6. Find the [S3 Bucket](https://s3.console.aws.amazon.com/s3/home) that CDK created for the Construct Catalog (e.g. `construct-catalog-dev-xxxxx-websitebucketxxxxxxxx-xxxxxxxxxxxx`) and append one of the package paths to the **DomainName** from the previous step to test that the catalog deployed correctly (e.g. `http://dxxxxxxxxxxxxx.cloudfront.net/packages/cdk-secrets@0.4.1`).
+
+**NOTE:** At this time, the bare `http://dxxxxxxxxxxxxx.cloudfront.net` URL redirects to the **@awscdkio** Twitter account page.
+
+#### Troubleshooting
+
+**`Unable to determine default account and/or region` when running `cdk` commands**
+
+You don't have default AWS credentials and a default region configured for your AWS CLI. If you're using multiple profiles, you can add `--profile <profile-name>` (e.g. `--profile dev`) to the `cdk` commands for it to take effect. If you're still getting the same error, check to ensure a default region is configured for that profile in your `~/.aws/config` file, or `export` the desired region (e.g. `export AWS_DEFAULT_REGION=us-east-1`) before trying the `cdk` command again.
+
 ## License
 
 This project is licensed under [Apache 2.0](./LICENSE)
