@@ -1,5 +1,7 @@
 # CDK Construct Catalog
 
+[![Actions Status](https://github.com/construct-catalog/catalog/workflows/Deploy/badge.svg)](https://github.com/construct-catalog/catalog/actions)
+
 The **CDK Construct Catalog** (https://awscdk.io) is an index of multi-language AWS CDK libraries. 
 
 > This is a community project and is not officially supported by AWS.
