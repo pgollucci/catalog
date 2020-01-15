@@ -8,5 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: ./build.yaml
+    - uses: actions/checkout@v1
+    - uses: .github/workflows/build.yml
     - run: find .
