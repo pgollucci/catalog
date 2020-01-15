@@ -17,10 +17,19 @@ At the moment, you can simply use Twitter to search the catalog. Simply include 
 The Construct Catalog will automatically discover jsii multi-language modules published to npm with the `cdk` keyword:
 
 1. Follow the instructions in [jsii/README](https://github.com/aws/jsii) on how to create a jsii module.
+
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
-3. Publish your module to all package managers. You can use [aws-delivlib](https://github.com/awslabs/aws-delivlib) to define your multi-language release pipeline. This is the same tech we use to publish the AWS CDK to all package managers.
-4. If your module is not picked up by @awscdkio within 10 minutes, see the troubleshooting section below.
-5. [Optional] If you provide an `author.twitter` value (with or without the '@') in your package.json, that handle will be "@mentioned" when the catalog tweets about new versions.
+
+3. If your `package.json` includes `author.twitter` (with or without the '@'), that handle will be "@mentioned" when the 
+   catalog tweets about new versions.
+
+4. Publish your module to all package managers. Here are some recommended tools:
+   - [jsii publish GitHub Action](https://github.com/marketplace/actions/jsii-publish) by [udondan](https://github.com/udondan)
+   - [aws-delivlib](https://github.com/awslabs/aws-delivlib) used by the AWS CDK
+
+5. If your module is not picked up by @awscdkio within 10 minutes, see the troubleshooting section below.
+
+
 Here are some examples for modules: [cdk-secrets](https://github.com/udondan/cdk-secrets), [cdk-watchful](https://github.com/eladb/cdk-watchful), [cdk-dynamo-table-viewer](https://github.com/eladb/cdk-dynamo-table-viewer).
 
 **Troubleshooting**
