@@ -1,6 +1,6 @@
-name: CI
+name: Deploy
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -8,19 +8,5 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '10.x'
-    - name: install yarn
-      run: npm install -g yarn
-    - name: install dependencies
-      run: yarn install
-    - name: build
-      run: |
-        cd packages/catalog
-        yarn build
-    - name: synth
-      run: |
-        cd packages/catalog
-        npx cdk synth
+    - uses: ./build.yaml
+    - run: find .
