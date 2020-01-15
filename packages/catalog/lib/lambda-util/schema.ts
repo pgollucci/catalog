@@ -29,5 +29,6 @@ export interface PackageMetadata {
   author: {
     name: string;
     url: string;
+    twitter?: string;
   };
 }
