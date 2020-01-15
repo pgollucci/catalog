@@ -21,4 +21,6 @@ jobs:
         cd packages/catalog
         yarn build
     - name: synth
-      run: npx cdk synth
+      run: |
+        cd packages/catalog
+        npx cdk synth
