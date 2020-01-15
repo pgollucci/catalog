@@ -58,7 +58,7 @@ export async function handler(event: SQSEvent) {
         }
 
         // store package.json
-        const packageJson = await fs.readFile(path.join(moduleDir, 'package.json'), 'utf-8');
+        const packageJson = JSON.parse(await fs.readFile(path.join(moduleDir, 'package.json'), 'utf-8'));
     
         try {
           await docgen.renderDocs({
