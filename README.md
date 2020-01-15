@@ -20,8 +20,9 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
 
-3. If your `package.json` includes `author.twitter` (with or without the '@'), that handle will be "@mentioned" when the 
-   catalog tweets about new versions.
+3. You can optionally add an `awscdkio.twitter` field in your package.json file that includes a
+   Twitter handle (with or without the '@'). This handle will be "@mentioned" when the catalog 
+   tweets about new versions (see this [package.json](https://github.com/eladb/cdk-watchful/blob/master/package.json#L5) as an example).
 
 4. Publish your module to all package managers. Here are some recommended tools:
    - [jsii publish GitHub Action](https://github.com/marketplace/actions/jsii-publish) by [udondan](https://github.com/udondan)
