@@ -17,9 +17,7 @@ jobs:
     - name: install dependencies
       run: yarn install
     - name: build
-      run: |
-        cd packages/catalog
-        yarn build
+      run: npx lerna run build
     - name: synth
       run: |
         cd packages/catalog
