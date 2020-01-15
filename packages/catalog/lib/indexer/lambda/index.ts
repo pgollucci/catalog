@@ -78,14 +78,13 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     if (twitterHandle && !twitterHandle.startsWith('@')) {
       twitterHandle = '@' + twitterHandle;
     }
-    const author = twitterHandle ? `by ${twitterHandle}` : '';
+    const author = twitterHandle ? ` by ${twitterHandle}` : '';
 
     const status = [
-      title,
+      title + author,
       pkg.url,
       '',
       desc,
-      author,
       hashtags,
     ].join('\n');
 
