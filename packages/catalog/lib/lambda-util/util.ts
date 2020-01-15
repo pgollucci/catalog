@@ -90,12 +90,14 @@ export function extractPackageStream(sqsEvent: AWSLambda.SQSEvent): Array<Packag
 
     console.log({ dynamoRecord: record.dynamodb });
 
+    const jsonText = parseOptionStringValue(record.dynamodb, PackageTableAttributes.JSON);
+
     records.push({
       name: parseStringValue(record.dynamodb, PackageTableAttributes.NAME),
       version: parseStringValue(record.dynamodb, PackageTableAttributes.VERSION),
       metadata: JSON.parse(parseStringValue(record.dynamodb, PackageTableAttributes.METADATA)),
       url: parseOptionStringValue(record.dynamodb, PackageTableAttributes.URL),
-      json: JSON.parse(parseStringValue(record.dynamodb, PackageTableAttributes.JSON))
+      json: jsonText ? JSON.parse(jsonText) : undefined
     });
   }
 
