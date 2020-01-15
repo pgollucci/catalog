@@ -41,15 +41,15 @@ This repo includes multiple packages:
 
 Check out our [issue list](https://github.com/construct-catalog/catalog/issues) for ideas for contributions.
 
-## Usage
+### Development Environment
 
-### Getting started
+#### Getting started
 
 1. Clone the project and `cd` into its root directory.
 2. `yarn install`
 3. `npx lerna run build`
 
-### Building the catalog
+#### Building the catalog
 
 1. Follow the **Getting started** instructions.
 2. `cd ./packages/catalog`
@@ -67,7 +67,7 @@ Check out our [issue list](https://github.com/construct-catalog/catalog/issues) 
 
 **NOTE:** At this time, the bare `http://dxxxxxxxxxxxxx.cloudfront.net` URL redirects to the **@awscdkio** Twitter account page.
 
-## Troubleshooting
+#### Troubleshooting
 
 **`Unable to determine default account and/or region` when running `cdk` commands**
 
