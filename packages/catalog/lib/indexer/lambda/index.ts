@@ -72,18 +72,18 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     const desc = pkg.metadata.description || '';
     const hashtags = (pkg.metadata.keywords || []).map(k => `#${k.replace(/-/g, '_')}`).join(' ');
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
-    let twitterHandle = pkg.metadata.author?.twitter;
-    if (twitterHandle && !twitterHandle.startsWith('@')){
-      twitterHandle = "@" + twitterHandle;
+    let twitter = pkg.metadata.author?.twitter;
+    if (twitter && !twitter.startsWith('@')) {
+      twitter = "@" + twitter;
     }
-    const author = twitterHandle ? `by ${twitterHandle}` : '';
+    const author = twitter ? `by ${twitter}` : '';
     const status = [
       title,
       pkg.url,
       '',
       desc,
+      author,
       hashtags,
-      author
     ].join('\n')
     console.log(`POST statuses/update ${JSON.stringify({status})}`);
 
