@@ -9,9 +9,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - name: install yarn
+      run: npm install -g yarn
+    - name: install dependencies
+      run: yarn install
+    - name: build
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        cd packages/catalog
+        yarn build
+    - name: synth
+      run: npx cdk synth
