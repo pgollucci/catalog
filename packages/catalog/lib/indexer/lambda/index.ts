@@ -36,7 +36,7 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
     const getSecretOutput = await secrets.getSecretValue({
       SecretId: TWITTER_SECRET_ARN,
     }).promise();
-    
+
     if (!getSecretOutput.SecretString) {
       throw new Error(`cannot retrieve twitter credentials from secrets manager`);
     }
@@ -68,16 +68,22 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
       await pauseMyEventSource(context.functionName);
       throw new Error(`Rate limit exceeded, paused event source until next time window`);
     }
-    
+
     const desc = pkg.metadata.description || '';
     const hashtags = (pkg.metadata.keywords || []).map(k => `#${k.replace(/-/g, '_')}`).join(' ');
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
+    let twitterHandle = pkg.metadata.author?.twitter;
+    if (twitterHandle && !twitterHandle.startsWith('@')){
+      twitterHandle = "@" + twitterHandle;
+    }
+    const author = twitterHandle ? `by ${twitterHandle}` : '';
     const status = [
       title,
       pkg.url,
       '',
       desc,
-      hashtags
+      hashtags,
+      author
     ].join('\n')
     console.log(`POST statuses/update ${JSON.stringify({status})}`);
 
