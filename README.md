@@ -65,8 +65,9 @@ Check out our [issue list](https://github.com/construct-catalog/catalog/issues) 
 
 1. Follow the **Getting started** instructions.
 2. `cd ./packages/catalog`
-3. `cdk bootstrap`
-4. `cdk deploy`
+3. `cdk bootstrap aws://<your-account-number>/<region>`
+    - e.g. `aws://012345678910/us-east-1/`
+4. `cdk deploy construct-catalog-dev-$USER`
 5. Determine the CloudFront Distribution **Domain Name** for your CDK Construct Catalog deployment (e.g. `dxxxxxxxxxxxxx.cloudfront.net`), which can be found in your list of [Cloudfront Distributions](https://console.aws.amazon.com/cloudfront/home). Look for the one with an **Origin** value beginning with `construct-catalog-dev`.
     * If you have the AWS CLI installed, you can find the **Domain Name** by running this command:
       ```bash
