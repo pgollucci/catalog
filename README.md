@@ -2,7 +2,7 @@
 
 [![Actions Status](https://github.com/construct-catalog/catalog/workflows/Deploy/badge.svg)](https://github.com/construct-catalog/catalog/actions)
 
-The **CDK Construct Catalog** (https://awscdk.io) is an index of multi-language AWS CDK libraries. 
+The **CDK Construct Catalog** (https://awscdk.io) is an index of multi-language AWS CDK libraries.
 
 > This is a community project and is not officially supported by AWS.
 
@@ -21,7 +21,7 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
 
 3. You can optionally add an `awscdkio.twitter` field in your package.json file that includes a
-   Twitter handle (with or without the '@'). This handle will be "@mentioned" when the catalog 
+   Twitter handle (with or without the '@'). This handle will be "@mentioned" when the catalog
    tweets about new versions (see this [package.json](https://github.com/eladb/cdk-watchful/blob/master/package.json#L5) as an example).
 
 4. Publish your module to all package managers. Here are some recommended tools:
@@ -79,6 +79,18 @@ Check out our [issue list](https://github.com/construct-catalog/catalog/issues) 
 6. Find the [S3 Bucket](https://s3.console.aws.amazon.com/s3/home) that CDK created for the Construct Catalog (e.g. `construct-catalog-dev-xxxxx-websitebucketxxxxxxxx-xxxxxxxxxxxx`) and append one of the package paths to the **DomainName** from the previous step to test that the catalog deployed correctly (e.g. `http://dxxxxxxxxxxxxx.cloudfront.net/packages/cdk-secrets@0.4.1`).
 
 **NOTE:** At this time, the bare `http://dxxxxxxxxxxxxx.cloudfront.net` URL redirects to the **@awscdkio** Twitter account page.
+
+#### Building the frontend
+
+1. Follow the **Getting started** instructions.
+2. `cd ./packages/catalog-frontend`
+3. `yarn install`
+4. `yarn start`
+5. Visit [http://localhost:3000/](http://localhost:3000/) in your browser.
+6. To build and preview the site as it would look in Production, do the following:
+    * `yarn build`
+    * `npx serve build`.
+    * Visit [http://localhost:5000](http://localhost:5000/) in your browser (note the different port number).
 
 #### Troubleshooting
 
