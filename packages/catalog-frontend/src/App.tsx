@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import GithubCorner from 'react-github-corner';
 import logo from './logo.png';
 import './App.css';
 
@@ -42,6 +43,8 @@ const App: React.FC = () => {
       <section className="App-disclaimer">
         <p>This is a community project and is not supported by AWS</p>
       </section>
+
+      <GithubCorner href="https://github.com/construct-catalog/catalog" />
     </div>
   );
 }
