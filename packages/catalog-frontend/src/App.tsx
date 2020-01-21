@@ -40,7 +40,7 @@ const App: React.FC = () => {
       </section>
 
       <section className="App-disclaimer">
-        <p>This is a community project and is not supported by AWS.</p>
+        <p>This is a community project and is not supported by AWS</p>
       </section>
     </div>
   );
