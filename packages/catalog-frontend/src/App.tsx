@@ -1,31 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
+import SearchForm from './SearchForm';
 import GithubCorner from 'react-github-corner';
 import logo from './logo.png';
 import './App.css';
-
-const SearchForm: React.FC = () => {
-  const [query, setQuery] = useState("")
-
-  const handleSubmit = (event: React.FormEvent) => {
-    const baseUrl = "https://twitter.com/search?src=typed_query&q="
-    const q = encodeURIComponent(
-      "(#cdk AND (" + query.split(/ /).join(' OR ') + ")) (from:awscdkio) filter:links -filter:replies"
-    )
-
-    event.preventDefault()
-    window.location.href = baseUrl + q
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input type="text"
-        value={query}
-        placeholder="Search packages..."
-        onChange={e => setQuery(e.target.value)}
-        autoFocus />
-    </form >
-  );
-}
 
 const App: React.FC = () => {
   return (
