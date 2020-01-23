@@ -58,8 +58,8 @@ Check out our [issue list](https://github.com/construct-catalog/catalog/issues) 
 #### Getting started
 
 1. Clone the project and `cd` into its root directory.
-2. `yarn install`
-3. `npx lerna run build`
+2. `npx lerna bootstrap`: installs and links dependencies
+3. `npx lerna run build`: builds all modules in topological order
 
 #### Building the catalog
 

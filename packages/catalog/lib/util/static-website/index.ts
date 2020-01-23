@@ -56,6 +56,12 @@ export interface StaticWebsiteProps {
   readonly sourceConfigs?: cloudfront.SourceConfiguration[];
 
   /**
+   * The path within the S3 bucket to use for the default (catch all) origin.
+   * @default /
+   */
+  readonly defaultOriginPath?: string;
+
+  /**
    * Error configurations to set for the CloudFront distribution.
    * @default none, unless spa also set to true
    */
@@ -126,6 +132,7 @@ export class StaticWebsite extends Construct {
         originAccessIdentity: originAccessIdentity,
         s3BucketSource: bucket
       },
+      originPath: props.defaultOriginPath,
       behaviors: props.behaviors ? props.behaviors : [
         {
           isDefaultBehavior: true,

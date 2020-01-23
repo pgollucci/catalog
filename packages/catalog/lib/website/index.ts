@@ -1,15 +1,19 @@
 import { Construct } from "@aws-cdk/core";
 import s3 = require('@aws-cdk/aws-s3');
+import * as cf from '@aws-cdk/aws-cloudfront';
 import { StaticWebsite } from "../util/static-website";
 import { MaterializeBucketIndex } from "../util/materialize-bucket-index";
 import { IHostedZone } from "@aws-cdk/aws-route53";
 import s3deploy = require('@aws-cdk/aws-s3-deployment');
-import path = require('path');
+import * as path from 'path';
 
 export interface WebsiteProps {
   readonly hostedZone?: IHostedZone;
   readonly domainName?: string;
 }
+
+const distDir = path.join(path.dirname(require.resolve('catalog-frontend/package.json')), 'build');
+console.log({distDir});
 
 export class Website extends Construct {
   public readonly bucket: s3.Bucket;
@@ -29,19 +33,30 @@ export class Website extends Construct {
       bucket: this.bucket
     });
 
-    const homePrefix = 'website/';
+    const websitePrefix = 'website';
 
     new StaticWebsite(this, 'StaticWebsite', {
       bucket: this.bucket,
       hostedZone: props.hostedZone,
       domainName: props.domainName,
-      indexFile: `${homePrefix}index.html`,
+      defaultOriginPath: `/${websitePrefix}`,
+      sourceConfigs: [
+        {
+          behaviors: [
+            {
+              pathPattern: 'packages/*',
+              allowedMethods: cf.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
+              compress: true
+            }
+          ]
+        }
+      ]
     });
 
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
       destinationBucket: this.bucket,
-      destinationKeyPrefix: homePrefix,
-      sources: [ s3deploy.Source.asset(path.join(__dirname, '..', '..', 'website')) ],
+      destinationKeyPrefix: websitePrefix,
+      sources: [ s3deploy.Source.asset(distDir) ],
     });
   }
 }
