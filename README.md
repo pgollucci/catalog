@@ -36,7 +36,7 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 
 `package.json` configuration:
 
-```json
+```js
 {
   "jsii": { ... }          // jsii config (required)
   "keywords": [ "cdk" ],   // required
