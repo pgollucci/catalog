@@ -14,7 +14,7 @@ import { Schedule } from "@aws-cdk/aws-events";
 import { AtomicCounter } from "../util/atomic-counter";
 import { PolicyStatement } from "@aws-cdk/aws-iam";
 
-export interface IndexerProps {
+export interface TweeterProps {
   /**
    * The input topic.
    */
@@ -47,12 +47,15 @@ export interface TweetRate {
   readonly window?: Duration;
 }
 
-export class Indexer extends Construct {
+/**
+ * Posts a tweet for each new module.
+ */
+export class Tweeter extends Construct {
   public readonly tweetsPerFiveMinute: cloudwatch.Metric;
   public readonly logGroup: string;
   public readonly table: dynamo.Table;
 
-  constructor(scope: Construct, id: string, props: IndexerProps) {
+  constructor(scope: Construct, id: string, props: TweeterProps) {
     super(scope, id);
 
     const rate = props.rate || { };
