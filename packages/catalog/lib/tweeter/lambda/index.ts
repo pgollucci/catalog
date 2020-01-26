@@ -60,7 +60,7 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
       continue;
     }
 
-    // take a request token by decrementing the quote. if we've reached our
+    // take a request token by decrementing the quota. if we've reached our
     // quota for the time window (300 requests every 3 hours), this will fail
     // and message will be returned to the queue for a retry after 5 minutes.
     if (!await atomicCounterClient.tryDecrement()) {
@@ -69,12 +69,14 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
       throw new Error(`Rate limit exceeded, paused event source until next time window`);
     }
 
+    const awscdkio = pkg.json?.awscdkio ?? { };
+
     const desc = pkg.metadata.description || '';
     const hashtags = (pkg.metadata.keywords || []).map(k => `#${k.replace(/-/g, '_')}`).join(' ');
     const title = `${pkg.name.replace(/@/g, '')} ${pkg.version}`;
 
     // extract twitter handle from package.json/awscdkio.twitter field (if exists)
-    let twitterHandle = pkg.json.awscdkio?.twitter;
+    let twitterHandle = awscdkio.twitter;
     if (twitterHandle && !twitterHandle.startsWith('@')) {
       twitterHandle = '@' + twitterHandle;
     }
@@ -95,7 +97,11 @@ export async function handler(event: AWSLambda.SQSEvent, context: AWSLambda.Cont
 
     let tweetid;
 
-    if (twitter) {
+    // determine if we should announce (tweet) this module (default is true).
+    const announce = awscdkio.announce === undefined ? true : awscdkio.announce;
+    console.log(JSON.stringify({ announce }));
+
+    if (twitter && announce) {
       const resp = await twitter.post('statuses/update', { status }) as PostTweetResponse;
       console.log(JSON.stringify({ tweet: resp }));
       tweetid = resp.id_str;

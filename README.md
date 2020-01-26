@@ -20,16 +20,32 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 
 2. Make sure your `package.json` file includes at least the keyword `cdk`.
 
-3. You can optionally add an `awscdkio.twitter` field in your package.json file that includes a
-   Twitter handle (with or without the '@'). This handle will be "@mentioned" when the catalog
-   tweets about new versions (see this [package.json](https://github.com/eladb/cdk-watchful/blob/master/package.json#L5) as an example).
+3. Additional configuration options can be specified through the `awscdkio` section in your `package.json` file:
+
+    - `twitter` (string): a Twitter handle (with or without the '@'). This handle will be
+      "@mentioned" when the catalog tweets about new versions (see this
+      [package.json](https://github.com/eladb/cdk-watchful/blob/master/package.json#L5)
+      as an example).
+    - `announce` (boolean): indicates if a tweet should be posted when new versions of this module are published (default is `true`).
 
 4. Publish your module to all package managers. Here are some recommended tools:
    - [jsii publish GitHub Action](https://github.com/marketplace/actions/jsii-publish) by [udondan](https://github.com/udondan)
    - [aws-delivlib](https://github.com/awslabs/aws-delivlib) used by the AWS CDK
 
-5. If your module is not picked up by @awscdkio within 10 minutes, see the troubleshooting section below.
+5. If your module is not picked up by [@awscdkio](https://twitter.com/awscdkio) within ~10 minutes, see the troubleshooting section below.
 
+`package.json` configuration:
+
+```json
+{
+  "jsii": { ... }          // jsii config (required)
+  "keywords": [ "cdk" ],   // required
+  "awscdkio": {            // all optional
+    "twitter": "@account", // @mention in announcement
+    "announce": true       // this is the default
+  }
+}
+```
 
 Here are some examples for modules: [cdk-secrets](https://github.com/udondan/cdk-secrets), [cdk-watchful](https://github.com/eladb/cdk-watchful), [cdk-dynamo-table-viewer](https://github.com/eladb/cdk-dynamo-table-viewer).
 
