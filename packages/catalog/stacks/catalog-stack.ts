@@ -2,7 +2,7 @@ import { Stack, Construct, StackProps } from '@aws-cdk/core';
 import { Ingestion } from '../lib/ingestion';
 import { Renderer } from "../lib/renderer";
 import { Website } from '../lib/website';
-import { Indexer, TweetRate } from '../lib/indexer';
+import { Tweeter, TweetRate } from '../lib/tweeter';
 import secrets = require('@aws-cdk/aws-secretsmanager');
 import { Monitoring } from '../lib/monitoring';
 import { HostedZone } from '@aws-cdk/aws-route53';
@@ -40,9 +40,11 @@ export class CatalogStack extends Stack {
       website
     });
 
-    const twitterCredentials = props.twitterSecretArn ? secrets.Secret.fromSecretArn(this, 'twitter', props.twitterSecretArn) : undefined;
+    const twitterCredentials = props.twitterSecretArn 
+      ? secrets.Secret.fromSecretArn(this, 'twitter', props.twitterSecretArn) 
+      : undefined;
 
-    const indexer = new Indexer(this, 'Indexer', { 
+    const tweeter = new Tweeter(this, 'Indexer', { 
       input: renderer.topic,
       twitterCredentials,
       rate: props.twitterRateLimit
@@ -50,13 +52,13 @@ export class CatalogStack extends Stack {
 
     new Monitoring(this, 'Monitoring', {
       renderedPerFiveMinutes: renderer.renderedPerFiveMinutes,
-      tweetsPerFiveMinutes: indexer.tweetsPerFiveMinute,
+      tweetsPerFiveMinutes: tweeter.tweetsPerFiveMinute,
       discoveredPerFiveMinutes: ingestion.discoveredPerFiveMinutes,
       bucket: website.bucket,
-      indexerLogGroup: indexer.logGroup,
+      indexerLogGroup: tweeter.logGroup,
       ingestionLogGroup: ingestion.logGroup,
       rendererLogGroup: renderer.logGroup,
-      packagesTable: indexer.table
+      packagesTable: tweeter.table
     });
   }
 }
