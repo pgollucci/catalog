@@ -14,6 +14,8 @@ At the moment, you can simply use Twitter to search the catalog. Simply include 
 
 ## Publishing modules
 
+It is recommended to read the post [Writing Constructs](https://www.matthewbonig.com/2020/01/11/creating-constructs) by Matthew Bonig. It includes instructions and an end-to-end sample, and also discuss publishing to @awscdkio.
+
 The Construct Catalog will automatically discover jsii multi-language modules published to npm with the `cdk` keyword:
 
 1. Follow the instructions in [jsii/README](https://github.com/aws/jsii) on how to create a jsii module.
