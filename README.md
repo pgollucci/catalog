@@ -32,6 +32,7 @@ The Construct Catalog will automatically discover jsii multi-language modules pu
 
 4. Publish your module to all package managers. Here are some recommended tools:
    - [jsii publish GitHub Action](https://github.com/marketplace/actions/jsii-publish) by [udondan](https://github.com/udondan)
+   - [jsii-release](https://github.com/eladb/jsii-release)
    - [aws-delivlib](https://github.com/awslabs/aws-delivlib) used by the AWS CDK
 
 5. If your module is not picked up by [@awscdkio](https://twitter.com/awscdkio) within ~10 minutes, see the troubleshooting section below.
