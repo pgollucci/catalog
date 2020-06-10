@@ -1,5 +1,5 @@
-import { App, Stack, RemovalPolicy } from "@aws-cdk/core";
-import s3 = require('@aws-cdk/aws-s3');
+import { App, Stack, RemovalPolicy } from "monocdk-experiment";
+import s3 = require('monocdk-experiment/aws-s3');
 import { MaterializeBucketIndex } from "../lib/util/materialize-bucket-index";
 
 const app = new App();

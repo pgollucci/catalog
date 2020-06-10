@@ -1,15 +1,15 @@
-import lambda = require('@aws-cdk/aws-lambda');
+import lambda = require('monocdk-experiment/aws-lambda');
 import os = require('os');
 import path = require('path');
 import fs = require('fs');
-import iam = require('@aws-cdk/aws-iam');
-import { copyDirectory, FollowMode } from '@aws-cdk/assets/lib/fs';
-import sqs = require('@aws-cdk/aws-sqs');
-import ec2 = require('@aws-cdk/aws-ec2');
-import logs = require('@aws-cdk/aws-logs');
+import iam = require('monocdk-experiment/aws-iam');
+import sqs = require('monocdk-experiment/aws-sqs');
+import ec2 = require('monocdk-experiment/aws-ec2');
+import logs = require('monocdk-experiment/aws-logs');
 
-import { Construct, Duration } from '@aws-cdk/core';
-import { AssetOptions } from '@aws-cdk/aws-s3-assets';
+import { Construct, Duration, FileSystem, SymlinkFollowMode } from 'monocdk-experiment';
+import { AssetOptions } from 'monocdk-experiment/aws-s3-assets';
+import { FollowMode } from 'monocdk-experiment/lib/assets';
 
 export interface NodeFunctionProps {
   /**
@@ -37,7 +37,7 @@ export interface NodeFunctionProps {
 
   /**
    * The name of the function exported by `indexFile`.
-   * 
+   *
    * @default handler
    */
   readonly indexFunction?: string;
@@ -228,11 +228,11 @@ function prepareBundle(props: NodeFunctionProps): string {
   if (!props.dependencies || props.dependencies.length === 0) {
     return props.codeDirectory;
   }
-  
+
   const bundleDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bundle'));
 
-  copyDirectory(props.codeDirectory, bundleDir, {
-    follow: FollowMode.ALWAYS
+  FileSystem.copyDirectory(props.codeDirectory, bundleDir, {
+    follow: SymlinkFollowMode.ALWAYS
   });
 
   const bundleModules = `${bundleDir}/node_modules`;
@@ -260,9 +260,9 @@ function copyModule(packageName: string, nodeModules: string, source?: string) {
   if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
 
-    copyDirectory(packageDir, targetDir, { 
+    FileSystem.copyDirectory(packageDir, targetDir, {
       exclude: [ 'node_modules' ] ,
-      follow: FollowMode.ALWAYS
+      follow: SymlinkFollowMode.ALWAYS
     });
   }
 

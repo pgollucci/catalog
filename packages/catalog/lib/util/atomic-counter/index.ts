@@ -1,12 +1,12 @@
-import { Construct, RemovalPolicy } from "@aws-cdk/core";
-import sns = require('@aws-cdk/aws-sns');
-import dynamodb = require('@aws-cdk/aws-dynamodb');
-import targets = require('@aws-cdk/aws-events-targets');
-import events = require('@aws-cdk/aws-events');
+import { Construct, RemovalPolicy } from "monocdk-experiment";
+import sns = require('monocdk-experiment/aws-sns');
+import dynamodb = require('monocdk-experiment/aws-dynamodb');
+import targets = require('monocdk-experiment/aws-events-targets');
+import events = require('monocdk-experiment/aws-events');
 import { NodeFunction } from "../node-function";
 import consts = require('./auto-reset-lambda/consts');
-import lambda = require('@aws-cdk/aws-lambda');
-import cr = require('@aws-cdk/custom-resources');
+import lambda = require('monocdk-experiment/aws-lambda');
+import cr = require('monocdk-experiment/custom-resources');
 
 export interface AutoReset {
   /**
@@ -73,16 +73,17 @@ export class AtomicCounter extends Construct {
         schedule: props.autoReset.period,
         targets: [ new targets.LambdaFunction(resetHandler) ]
       });
-  
+
       this.table.grantWriteData(resetHandler);
       this.autoResetTopic.grantPublish(resetHandler);
     }
 
     const setInitialValue = new cr.AwsCustomResource(this, 'SetInitialValue', {
+      policy: cr.AwsCustomResourcePolicy.fromSdkCalls({ resources: ['*'] }),
       onCreate: {
         service: 'DynamoDB',
         action: 'putItem',
-        physicalResourceId: 'SetInitialValue',
+        physicalResourceId: cr.PhysicalResourceId.of('SetInitialValue'),
         parameters: {
           TableName: this.table.tableName,
           Item: {
@@ -91,7 +92,7 @@ export class AtomicCounter extends Construct {
           }
         }
       }
-    });    
+    });
 
     this.table.grantWriteData(setInitialValue);
   }

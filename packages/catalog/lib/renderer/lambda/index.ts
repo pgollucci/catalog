@@ -50,7 +50,7 @@ export async function handler(event: SQSEvent) {
       await withTempDirectory(async outdir => {
 
         const moduleDir = path.join(modulesDirectory, name);
-  
+
         // check if the module is a .jsii module. skip otherwise
         if (!await fs.pathExists(path.join(moduleDir, '.jsii'))) {
           console.log(`Skipping non-jsii module ${name}@${version}`);
@@ -59,17 +59,17 @@ export async function handler(event: SQSEvent) {
 
         // store package.json
         const packageJson = JSON.parse(await fs.readFile(path.join(moduleDir, 'package.json'), 'utf-8'));
-    
+
         try {
           await docgen.renderDocs({
             modulesDirectory,
             outdir
-          });  
+          });
         } catch (e) {
           console.log(`ERROR: unable to render docs for module ${name}@${version}: ${e.stack}`);
           return;
         }
-    
+
         // upload to s3
         const sourceDir = path.join(outdir, name);
         const objectKeyPrefix = path.join(OBJECT_PREFIX, `${name}@${version}/`);
@@ -125,8 +125,8 @@ async function uploadDir(local: string, bucketName: string, objectKeyPrefix: str
 }
 
 async function npmInstall(module: string, options: { cwd: string }) {
-  await exec(`npm install --ignore-scripts ${module}`, { 
-    cwd: options.cwd, 
+  await exec(`npm install --ignore-scripts ${module}`, {
+    cwd: options.cwd,
     env: {
       ...process.env,
       HOME: options.cwd

@@ -1,6 +1,6 @@
-import { App, Stack, Construct, Duration } from '@aws-cdk/core';
+import { App, Stack, Construct, Duration } from 'monocdk-experiment';
 import { AtomicCounter } from '../lib/util/atomic-counter';
-import { Schedule } from '@aws-cdk/aws-events';
+import { Schedule } from 'monocdk-experiment/aws-events';
 import { NodeFunction } from '../lib/util/node-function';
 
 class TestStack extends Stack {

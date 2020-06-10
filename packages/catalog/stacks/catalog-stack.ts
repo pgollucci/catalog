@@ -1,11 +1,11 @@
-import { Stack, Construct, StackProps } from '@aws-cdk/core';
+import { Stack, Construct, StackProps } from 'monocdk-experiment';
 import { Ingestion } from '../lib/ingestion';
 import { Renderer } from "../lib/renderer";
 import { Website } from '../lib/website';
 import { Tweeter, TweetRate } from '../lib/tweeter';
-import secrets = require('@aws-cdk/aws-secretsmanager');
+import secrets = require('monocdk-experiment/aws-secretsmanager');
 import { Monitoring } from '../lib/monitoring';
-import { HostedZone } from '@aws-cdk/aws-route53';
+import { HostedZone } from 'monocdk-experiment/aws-route53';
 
 export interface CatalogStackProps extends StackProps {
   /**
@@ -34,17 +34,17 @@ export class CatalogStack extends Stack {
     });
 
     const ingestion = new Ingestion(this, 'Ingestion');
-    
-    const renderer = new Renderer(this, 'Renderer', { 
+
+    const renderer = new Renderer(this, 'Renderer', {
       input: ingestion.topic,
       website
     });
 
-    const twitterCredentials = props.twitterSecretArn 
-      ? secrets.Secret.fromSecretArn(this, 'twitter', props.twitterSecretArn) 
+    const twitterCredentials = props.twitterSecretArn
+      ? secrets.Secret.fromSecretArn(this, 'twitter', props.twitterSecretArn)
       : undefined;
 
-    const tweeter = new Tweeter(this, 'Indexer', { 
+    const tweeter = new Tweeter(this, 'Indexer', {
       input: renderer.topic,
       twitterCredentials,
       rate: props.twitterRateLimit

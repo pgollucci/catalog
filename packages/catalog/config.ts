@@ -1,5 +1,5 @@
 import { CatalogStackProps } from "./stacks/catalog-stack";
-import { Duration } from "@aws-cdk/core";
+import { Duration } from "monocdk-experiment";
 
 /**
  * Configuration for development stacks. Can be used in any account.

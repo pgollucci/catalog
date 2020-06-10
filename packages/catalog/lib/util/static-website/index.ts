@@ -1,11 +1,11 @@
 // stolen from https://github.com/CaerusKaru/waltersco-shs
-import { Construct } from '@aws-cdk/core';
-import * as certificatemanager from '@aws-cdk/aws-certificatemanager';
-import * as cloudfront from '@aws-cdk/aws-cloudfront';
-import * as iam from '@aws-cdk/aws-iam';
-import * as route53 from '@aws-cdk/aws-route53';
-import * as targets from '@aws-cdk/aws-route53-targets';
-import * as s3 from '@aws-cdk/aws-s3';
+import { Construct } from 'monocdk-experiment';
+import * as certificatemanager from 'monocdk-experiment/aws-certificatemanager';
+import * as cloudfront from 'monocdk-experiment/aws-cloudfront';
+import * as iam from 'monocdk-experiment/aws-iam';
+import * as route53 from 'monocdk-experiment/aws-route53';
+import * as targets from 'monocdk-experiment/aws-route53-targets';
+import * as s3 from 'monocdk-experiment/aws-s3';
 
 /**
  * Properties to configure the static website construct.
@@ -38,8 +38,8 @@ export interface StaticWebsiteProps {
   /**
    * A list of file extensions that are considered when appending the index file
    * name to a url.
-   * 
-   * @default 
+   *
+   * @default
    */
   readonly fileExtensions?: string[];
 
@@ -118,7 +118,7 @@ export class StaticWebsite extends Construct {
       .map((config: cloudfront.SourceConfiguration) => {
         const fixedConfig = {...config};
         if (!fixedConfig.s3OriginSource && !fixedConfig.customOriginSource) {
-          fixedConfig.s3OriginSource = {            
+          fixedConfig.s3OriginSource = {
             originAccessIdentity,
             s3BucketSource: bucket,
           };

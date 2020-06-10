@@ -1,7 +1,7 @@
-import { Construct, Stack } from "@aws-cdk/core";
-import cloudwatch = require('@aws-cdk/aws-cloudwatch');
-import s3 = require('@aws-cdk/aws-s3');
-import dynamodb = require('@aws-cdk/aws-dynamodb');
+import { Construct, Stack } from "monocdk-experiment";
+import cloudwatch = require('monocdk-experiment/aws-cloudwatch');
+import s3 = require('monocdk-experiment/aws-s3');
+import dynamodb = require('monocdk-experiment/aws-dynamodb');
 
 export interface MonitoringProps {
   readonly discoveredPerFiveMinutes: cloudwatch.Metric;
@@ -20,10 +20,10 @@ export class Monitoring extends Construct {
 
     const dashboard = new cloudwatch.Dashboard(this, 'Dashboard');
 
-    dashboard.addWidgets(new cloudwatch.TextWidget({ 
+    dashboard.addWidgets(new cloudwatch.TextWidget({
       width: 24,
       height: 1,
-      markdown: `# Resources` 
+      markdown: `# Resources`
     }));
 
     dashboard.addWidgets(new cloudwatch.TextWidget({
@@ -39,10 +39,10 @@ export class Monitoring extends Construct {
       ].join('\n')
     }));
 
-    dashboard.addWidgets(new cloudwatch.TextWidget({ 
+    dashboard.addWidgets(new cloudwatch.TextWidget({
       width: 24,
       height: 1,
-      markdown: `# Ingestion Pipeline` 
+      markdown: `# Ingestion Pipeline`
     }));
 
     dashboard.addWidgets(
@@ -59,7 +59,7 @@ export class Monitoring extends Construct {
   private linkToDynamoConsole(table: dynamodb.Table) {
     return `https://console.aws.amazon.com/dynamodb/home?region=${this.region}#tables:selected=${table.tableName};tab=items`;
   }
-  
+
   private linkToLogGroup(logGroup: string) {
     return `https://console.aws.amazon.com/cloudwatch/home?region=${this.region}#logEventViewer:group=${logGroup};start=PT30S`
   }

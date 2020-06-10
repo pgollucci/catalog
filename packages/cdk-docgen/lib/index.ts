@@ -13,14 +13,14 @@ export interface Options {
   /**
    * The node_modules directory. Docs will be rendered for all .jsii modules
    * in this directory (recursively).
-   * 
+   *
    * @default "node_modules"
    */
   readonly modulesDirectory?: string;
 
   /**
    * Output directory
-   * 
+   *
    * @default "dist"
    */
   readonly outdir?: string;
@@ -50,7 +50,7 @@ export async function renderDocs(options: Options = { }) {
       if (documents.length === 0) {
         return;
       }
-      
+
       sidebar.push('');
       sidebar.push(`* ${title}`);
       for (const resource of documents) {

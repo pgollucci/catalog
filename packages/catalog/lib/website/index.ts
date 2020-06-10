@@ -1,10 +1,10 @@
-import { Construct } from "@aws-cdk/core";
-import s3 = require('@aws-cdk/aws-s3');
-import * as cf from '@aws-cdk/aws-cloudfront';
+import { Construct } from "monocdk-experiment";
+import s3 = require('monocdk-experiment/aws-s3');
+import * as cf from 'monocdk-experiment/aws-cloudfront';
 import { StaticWebsite } from "../util/static-website";
 import { MaterializeBucketIndex } from "../util/materialize-bucket-index";
-import { IHostedZone } from "@aws-cdk/aws-route53";
-import s3deploy = require('@aws-cdk/aws-s3-deployment');
+import { IHostedZone } from "monocdk-experiment/aws-route53";
+import s3deploy = require('monocdk-experiment/aws-s3-deployment');
 import * as path from 'path';
 
 export interface WebsiteProps {

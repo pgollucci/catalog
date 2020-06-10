@@ -3,6 +3,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "build": "lerna run build"
+  },
   "name": "CDK-Construct-Catalog",
   "useWorkspaces": true,
   "devDependencies": {

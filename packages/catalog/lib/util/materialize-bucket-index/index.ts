@@ -1,7 +1,7 @@
-import { Construct } from "@aws-cdk/core";
-import s3 = require('@aws-cdk/aws-s3');
-import notifications = require('@aws-cdk/aws-s3-notifications');
-import lambda = require('@aws-cdk/aws-lambda');
+import { Construct } from "monocdk-experiment";
+import s3 = require('monocdk-experiment/aws-s3');
+import notifications = require('monocdk-experiment/aws-s3-notifications');
+import lambda = require('monocdk-experiment/aws-lambda');
 
 export interface MaterializeBucketIndexProps {
   /**

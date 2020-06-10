@@ -1,10 +1,10 @@
-import { Construct, Duration } from "@aws-cdk/core";
-import sqs = require('@aws-cdk/aws-sqs');
-import dynamo = require('@aws-cdk/aws-dynamodb');
-import sources = require('@aws-cdk/aws-lambda-event-sources');
+import { Construct, Duration } from "monocdk-experiment";
+import sqs = require('monocdk-experiment/aws-sqs');
+import dynamo = require('monocdk-experiment/aws-dynamodb');
+import sources = require('monocdk-experiment/aws-lambda-event-sources');
 import { NodeFunction } from '../node-function';
 import ids = require('./lambda/ids');
-import { StartingPosition } from "@aws-cdk/aws-lambda";
+import { StartingPosition } from "monocdk-experiment/aws-lambda";
 
 export interface DynamoQueueProps extends sqs.QueueProps {
   /**
@@ -14,7 +14,7 @@ export interface DynamoQueueProps extends sqs.QueueProps {
 
   /**
    * Event types to include (other events will be dropped). Set to `[]` to disable the stream.
-   * 
+   *
    * @default - all event types
    */
   readonly events?: EventType[];

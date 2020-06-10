@@ -1,18 +1,18 @@
-import { Construct, Duration, RemovalPolicy } from "@aws-cdk/core";
-import cloudwatch = require('@aws-cdk/aws-cloudwatch');
-import lambda = require('@aws-cdk/aws-lambda');
-import dynamo = require('@aws-cdk/aws-dynamodb');
-import sqs = require('@aws-cdk/aws-sqs');
-import subscriptions = require('@aws-cdk/aws-sns-subscriptions');
-import sns = require('@aws-cdk/aws-sns');
-import sources = require('@aws-cdk/aws-lambda-event-sources');
+import { Construct, Duration, RemovalPolicy } from "monocdk-experiment";
+import cloudwatch = require('monocdk-experiment/aws-cloudwatch');
+import lambda = require('monocdk-experiment/aws-lambda');
+import dynamo = require('monocdk-experiment/aws-dynamodb');
+import sqs = require('monocdk-experiment/aws-sqs');
+import subscriptions = require('monocdk-experiment/aws-sns-subscriptions');
+import sns = require('monocdk-experiment/aws-sns');
+import sources = require('monocdk-experiment/aws-lambda-event-sources');
 import { NodeFunction } from "../util/node-function";
 import { PackageTableAttributes } from "../lambda-util";
 import ids = require('./lambda/ids');
-import secrets = require('@aws-cdk/aws-secretsmanager');
-import { Schedule } from "@aws-cdk/aws-events";
+import secrets = require('monocdk-experiment/aws-secretsmanager');
+import { Schedule } from "monocdk-experiment/aws-events";
 import { AtomicCounter } from "../util/atomic-counter";
-import { PolicyStatement } from "@aws-cdk/aws-iam";
+import { PolicyStatement } from "monocdk-experiment/aws-iam";
 
 export interface TweeterProps {
   /**

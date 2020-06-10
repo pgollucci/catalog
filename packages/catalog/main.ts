@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import { CatalogStack } from './stacks/catalog-stack';
-import { App } from '@aws-cdk/core';
+import { App } from 'monocdk-experiment';
 
 import config = require('./config');
 

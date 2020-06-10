@@ -1,15 +1,15 @@
-import { Construct, RemovalPolicy, Duration } from "@aws-cdk/core";
+import { Construct, RemovalPolicy, Duration } from "monocdk-experiment";
 import { NodeFunction } from "../util/node-function";
 import ids = require('./lambda/ids');
-import { SqsEventSource } from "@aws-cdk/aws-lambda-event-sources";
+import { SqsEventSource } from "monocdk-experiment/aws-lambda-event-sources";
 import { Website } from "../website";
-import dynamo = require('@aws-cdk/aws-dynamodb');
+import dynamo = require('monocdk-experiment/aws-dynamodb');
 import { PackageTableAttributes } from "../lambda-util";
-import sns = require('@aws-cdk/aws-sns');
-import subscriptions = require('@aws-cdk/aws-sns-subscriptions');
-import sqs = require('@aws-cdk/aws-sqs');
+import sns = require('monocdk-experiment/aws-sns');
+import subscriptions = require('monocdk-experiment/aws-sns-subscriptions');
+import sqs = require('monocdk-experiment/aws-sqs');
 import { DynamoTopic, EventType } from "../util/dynamo-topic";
-import cloudwatch = require('@aws-cdk/aws-cloudwatch');
+import cloudwatch = require('monocdk-experiment/aws-cloudwatch');
 
 interface RendererProps {
   readonly input: sns.Topic;
@@ -63,7 +63,7 @@ export class Renderer extends Construct {
         [ids.Environment.TABLE_NAME]: table.tableName
       },
       events: [ new SqsEventSource(queue) ]
-    });    
+    });
 
     props.website.bucket.grantReadWrite(handler);
     table.grantReadWriteData(handler);

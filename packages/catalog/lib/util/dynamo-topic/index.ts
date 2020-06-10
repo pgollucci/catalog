@@ -1,10 +1,10 @@
-import { Construct } from "@aws-cdk/core";
-import sns = require('@aws-cdk/aws-sns');
-import dynamo = require('@aws-cdk/aws-dynamodb');
-import sources = require('@aws-cdk/aws-lambda-event-sources');
+import { Construct } from "monocdk-experiment";
+import sns = require('monocdk-experiment/aws-sns');
+import dynamo = require('monocdk-experiment/aws-dynamodb');
+import sources = require('monocdk-experiment/aws-lambda-event-sources');
 import { NodeFunction } from '../node-function';
 import ids = require('./lambda/ids');
-import { StartingPosition } from "@aws-cdk/aws-lambda";
+import { StartingPosition } from "monocdk-experiment/aws-lambda";
 
 export interface DynamoTopicProps extends sns.TopicProps {
   /**
@@ -14,7 +14,7 @@ export interface DynamoTopicProps extends sns.TopicProps {
 
   /**
    * Event types to include (other events will be dropped). Set to `[]` to disable the stream.
-   * 
+   *
    * @default - all event types
    */
   readonly events?: EventType[];

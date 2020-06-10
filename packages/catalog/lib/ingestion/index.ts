@@ -1,12 +1,12 @@
-import { Construct, Duration, RemovalPolicy } from "@aws-cdk/core";
-import events = require('@aws-cdk/aws-events');
-import targets = require('@aws-cdk/aws-events-targets');
-import cloudwatch = require('@aws-cdk/aws-cloudwatch');
+import { Construct, Duration, RemovalPolicy } from "monocdk-experiment";
+import events = require('monocdk-experiment/aws-events');
+import targets = require('monocdk-experiment/aws-events-targets');
+import cloudwatch = require('monocdk-experiment/aws-cloudwatch');
 import { NodeFunction } from "../util/node-function";
 import ids = require('./lambda/ids');
-import dynamo = require('@aws-cdk/aws-dynamodb');
+import dynamo = require('monocdk-experiment/aws-dynamodb');
 import { PackageTableAttributes } from '../lambda-util';
-import sns = require('@aws-cdk/aws-sns');
+import sns = require('monocdk-experiment/aws-sns');
 import { DynamoTopic, EventType } from "../util/dynamo-topic";
 
 export interface IngestionProps {
