@@ -13,6 +13,7 @@ import secrets = require('monocdk-experiment/aws-secretsmanager');
 import { Schedule } from "monocdk-experiment/aws-events";
 import { AtomicCounter } from "../util/atomic-counter";
 import { PolicyStatement } from "monocdk-experiment/aws-iam";
+import { DynamoTopic, EventType } from "../util/dynamo-topic";
 
 export interface TweeterProps {
   /**
@@ -54,6 +55,7 @@ export class Tweeter extends Construct {
   public readonly tweetsPerFiveMinute: cloudwatch.Metric;
   public readonly logGroup: string;
   public readonly table: dynamo.Table;
+  public readonly topic: sns.Topic;
 
   constructor(scope: Construct, id: string, props: TweeterProps) {
     super(scope, id);
@@ -72,7 +74,8 @@ export class Tweeter extends Construct {
     const table = new dynamo.Table(this, 'Table', {
       partitionKey: { type: dynamo.AttributeType.STRING, name: PackageTableAttributes.NAME, },
       sortKey: { type: dynamo.AttributeType.STRING, name: PackageTableAttributes.VERSION, },
-      removalPolicy: RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY,
+      stream: dynamo.StreamViewType.NEW_IMAGE
     });
 
     const requestQuota = new AtomicCounter(this, 'RequestQuota', {
@@ -143,5 +146,10 @@ export class Tweeter extends Construct {
     enableEventSourceHandler.addEventSource(new sources.SnsEventSource(requestQuota.autoResetTopic))
     enableEventSourceHandler.addEnvironment(ids.Environment.EVENT_SOURCE_ID, eventSourceMappingId);
     enableEventSourceHandler.addToRolePolicy(updateEventSourceMapping);
+
+    this.topic = new DynamoTopic(this, 'Topic', {
+      source: table,
+      events: [ EventType.INSERT ]
+    });
   }
 }
