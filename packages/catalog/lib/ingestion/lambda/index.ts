@@ -15,10 +15,9 @@ interface SearchResult {
 export async function handler() {
   console.log('querying npmjs');
 
-  let page = 0;
   let found = 0;
   while (true) {
-    const url = npmQuery(`keywords:cdk`, page);
+    const url = npmQuery(`keywords:cdk`, found);
     const response = await httpGet(url);
     const { total, objects } = JSON.parse(response.toString('utf-8')) as SearchResult;
     console.log(objects.length, total);
@@ -41,8 +40,7 @@ export async function handler() {
       await dynamodb.putItem(putItem).promise();
     }
 
-    found += objects.length
-    page += objects.length;
+    found += objects.length;
 
     if (found === total) {
       break;
@@ -55,8 +53,8 @@ handler().catch(e => {
   process.exit(1);
 });
 
-function npmQuery(query: string, page: number) {
-  return `http://registry.npmjs.com/-/v1/search?text=${encodeURIComponent(query)}&page=${page}&size=250`;
+function npmQuery(query: string, from: number) {
+  return `http://registry.npmjs.com/-/v1/search?text=${encodeURIComponent(query)}&from=${from}&size=250`;
 }
 
 function httpGet(options: any) {
