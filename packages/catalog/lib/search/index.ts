@@ -37,8 +37,19 @@ export class Search extends NestedStack {
       resources: [ '*' ]
     }));
 
+    const fargateRole = new iam.Role(this, 'PodExecutionRole', {
+      assumedBy: new iam.ServicePrincipal('eks-fargate-pods.amazonaws.com'),
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSFargatePodExecutionRolePolicy')],
+    });
+
     cluster.addFargateProfile('default', {
-      selectors: [ { namespace: 'default' } ]
+      selectors: [ { namespace: 'default' } ],
+      podExecutionRole: fargateRole,
+    });
+
+    cluster.awsAuth.addRoleMapping(fargateRole, {
+      username: 'system:node:{{SessionName}}',
+      groups: [ 'system:bootstrappers', 'system:nodes', 'system:node-proxier' ],
     });
 
     const updatesQueue = new sqs.Queue(this, 'UpdatesQueue');
