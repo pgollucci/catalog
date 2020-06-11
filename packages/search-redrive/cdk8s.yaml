@@ -1,0 +1,2 @@
+app: node main.js
+language: typescript
