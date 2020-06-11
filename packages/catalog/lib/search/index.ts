@@ -4,8 +4,9 @@ import * as sqs from 'monocdk-experiment/aws-sqs';
 import * as ec2 from 'monocdk-experiment/aws-ec2';
 import * as eks from 'monocdk-experiment/aws-eks';
 import * as iam from 'monocdk-experiment/aws-iam';
+import * as dynamodb from 'monocdk-experiment/aws-dynamodb';
 
-import { Construct, NestedStack } from 'monocdk-experiment';
+import { Construct } from 'monocdk-experiment';
 
 export interface SearchProps {
   /**
@@ -17,9 +18,14 @@ export interface SearchProps {
    * A topic which receives all module updates.
    */
   readonly updates: sns.Topic;
+
+  /**
+   * The DynamoDB table which contains all the modules.
+   */
+  readonly modulesTable: dynamodb.Table;
 }
 
-export class Search extends NestedStack {
+export class Search extends Construct {
   constructor(scope: Construct, id: string, props: SearchProps) {
     super(scope, id);
 
@@ -30,27 +36,18 @@ export class Search extends NestedStack {
     const cluster = new eks.Cluster(this, 'Kubernetes', {
       vpc: props.vpc,
       mastersRole,
+      defaultCapacity: 0,
+    });
+
+    cluster.addNodegroup('public', {
+      desiredSize: 4,
+      subnets: { subnetType: ec2.SubnetType.PUBLIC }
     });
 
     cluster.role.addToPolicy(new iam.PolicyStatement({
       actions: [ 'iam:ListAttachedRolePolicies' ],
       resources: [ '*' ]
     }));
-
-    const fargateRole = new iam.Role(this, 'PodExecutionRole', {
-      assumedBy: new iam.ServicePrincipal('eks-fargate-pods.amazonaws.com'),
-      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEKSFargatePodExecutionRolePolicy')],
-    });
-
-    cluster.addFargateProfile('default', {
-      selectors: [ { namespace: 'default' } ],
-      podExecutionRole: fargateRole,
-    });
-
-    cluster.awsAuth.addRoleMapping(fargateRole, {
-      username: 'system:node:{{SessionName}}',
-      groups: [ 'system:bootstrappers', 'system:nodes', 'system:node-proxier' ],
-    });
 
     const updatesQueue = new sqs.Queue(this, 'UpdatesQueue');
     props.updates.addSubscription(new subscriptions.SqsSubscription(updatesQueue));
@@ -60,16 +57,19 @@ export class Search extends NestedStack {
     });
 
     updatesQueue.grantConsumeMessages(serviceAccount);
+    updatesQueue.grantSendMessages(serviceAccount);
+    props.modulesTable.grantReadData(serviceAccount);
 
-    cluster.addResource('QueueUrlConfigMap', {
+    cluster.addResource('AwsResources', {
       apiVersion: 'v1',
       kind: 'ConfigMap',
       metadata: {
-        name: 'queue-url'
+        name: 'aws-resources'
       },
       data: {
-        arn: updatesQueue.queueArn,
-        url: updatesQueue.queueUrl,
+        queueArn: updatesQueue.queueArn,
+        queueUrl: updatesQueue.queueUrl,
+        tableName: props.modulesTable.tableName
       }
     });
   }

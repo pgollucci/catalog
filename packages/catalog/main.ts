@@ -12,7 +12,8 @@ const app = new App();
 const prod = new CatalogStack(app, 'construct-catalog-prod', config.prod);
 new CatalogStack(app, `construct-catalog-dev-${process.env.USER}`, config.dev)
 
-new SearchStack(app, 'construct-catalog-prod-search', {
+new SearchStack(app, 'construct-catalog-search-prod', {
+  modulesTable: prod.modulesTable,
   updates: prod.updates,
   env: config.prod.env
 });

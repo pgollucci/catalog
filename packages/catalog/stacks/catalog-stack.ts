@@ -7,6 +7,7 @@ import secrets = require('monocdk-experiment/aws-secretsmanager');
 import { Monitoring } from '../lib/monitoring';
 import { HostedZone } from 'monocdk-experiment/aws-route53';
 import * as sns from 'monocdk-experiment/aws-sns';
+import * as dynamodb from 'monocdk-experiment/aws-dynamodb';
 
 export interface CatalogStackProps extends StackProps {
   /**
@@ -31,6 +32,11 @@ export class CatalogStack extends Stack {
    * An SNS topic that receives all the updates.
    */
   public readonly updates: sns.Topic;
+
+  /**
+   * The modules table.
+   */
+  public readonly modulesTable: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props: CatalogStackProps) {
     super(scope, id, { env: props.env });
@@ -69,5 +75,6 @@ export class CatalogStack extends Stack {
     });
 
     this.updates = tweeter.topic;
+    this.modulesTable = tweeter.table;
   }
 }
