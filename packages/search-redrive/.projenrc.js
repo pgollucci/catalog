@@ -16,6 +16,8 @@ const project = new TypeScriptLibraryProject({
     'constructs': Semver.caret('2.0.0'),
     'stdk8s': Semver.caret('0.0.0')
   },
+  buildWorkflow: false,
+  releaseWorkflow: false,
 });
 
 project.addScripts({
