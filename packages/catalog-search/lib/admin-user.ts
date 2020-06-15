@@ -10,7 +10,6 @@ export class AdminUser extends Construct {
   constructor(scope: Construct, name: string, props: AdminUserProps) {
     super(scope, name);
 
-    // kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep adminuser | awk '{print $1}')
     const user = new k8s.ServiceAccount(this, 'AdminUser', {
       metadata: { namespace: props.namespace }
     });

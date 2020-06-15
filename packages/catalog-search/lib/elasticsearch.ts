@@ -1,6 +1,9 @@
 import { Construct, Node } from "constructs";
 import * as cdk8s from 'cdk8s';
 import * as eck from '../imports/elasticsearch.k8s.elastic.co/elasticsearch';
+// import * as k8s from '../imports/k8s';
+// import fs = require('fs');
+// import path = require('path');
 
 
 export class Elasticsearch extends Construct {
@@ -9,6 +12,14 @@ export class Elasticsearch extends Construct {
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
+
+    // const ca = new k8s.Secret(this, 'Secret', {
+    //   data: {
+    //     'ca.crt': fs.readFileSync(path.join(__dirname, 'tls', 'ca.crt')).toString('base64'),
+    //     'tls.crt': fs.readFileSync(path.join(__dirname, 'tls', 'tls.crt')).toString('base64'),
+    //     'tls.key': fs.readFileSync(path.join(__dirname, 'tls', 'tls.key')).toString('base64')
+    //   }
+    // });
 
     const crd = new cdk8s.Include(this, 'ElasticsearchOperator', {
       url: 'https://download.elastic.co/downloads/eck/1.1.2/all-in-one.yaml'
@@ -20,6 +31,13 @@ export class Elasticsearch extends Construct {
       },
       spec: {
         version: '7.7.1',
+        http: {
+          tls: {
+            selfSignedCertificate: {
+              disabled: true,
+            },
+          },
+        },
         nodeSets: [
           {
             name: 'default',
@@ -28,25 +46,12 @@ export class Elasticsearch extends Construct {
               'node.master': true,
               'node.data': true,
               'node.ingest': true,
-              'node.store.allow_mmap': false
+              'node.store.allow_mmap': false,
+              'xpack.security.enabled': true,
+              'xpack.security.http.ssl.enabled': false
             }
           }
-        ],
-        http: {
-          service: {
-            spec: {
-              type: 'NodePort',
-              ports: [
-                {
-                  // these are important for local debugging since the kind node
-                  // is configured to port map this. see cluster.yaml
-                  port: 9200,
-                  nodePort: 32000
-                }
-              ]
-            }
-          }
-        }
+        ]
       }
     })
 

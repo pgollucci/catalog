@@ -12,6 +12,9 @@ export class Kibana extends Construct {
     super(scope, id);
 
     new eck.Kibana(this, 'Kibana', {
+      metadata: {
+        name: 'kibana'
+      },
       spec: {
         version: '7.7.1',
         count: 1,
