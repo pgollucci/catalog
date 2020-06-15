@@ -1,4 +1,10 @@
 {
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "compilerOptions": {
     "alwaysStrict": true,
     "charset": "utf8",
@@ -22,13 +28,6 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2018",
-    "typeRoots": ["./node_modules/@types"]
-  },
-  "include": [
-    "**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "target": "ES2018"
+  }
 }
