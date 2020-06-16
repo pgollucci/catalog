@@ -1,6 +1,6 @@
-import { Construct } from "constructs";
-import * as eck from "../imports/kibana.k8s.elastic.co/kibana";
-import { Elasticsearch } from "./elasticsearch";
+import { Construct } from 'constructs';
+import * as eck from '../imports/kibana.k8s.elastic.co/kibana';
+import { Elasticsearch } from './elasticsearch';
 
 export interface KibanaProps {
 
@@ -13,15 +13,15 @@ export class Kibana extends Construct {
 
     new eck.Kibana(this, 'Kibana', {
       metadata: {
-        name: 'kibana'
+        name: 'kibana',
       },
       spec: {
         version: '7.7.1',
         count: 1,
         elasticsearchRef: {
-          name: props.elasticsearch.name
-        }
-      }
+          name: props.elasticsearch.name,
+        },
+      },
     })
 
   }
