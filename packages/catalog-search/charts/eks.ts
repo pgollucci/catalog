@@ -6,7 +6,7 @@ import { Indexer } from '../lib/indexer';
 import * as stdk8s from 'stdk8s';
 
 
-export class CatalogSearch extends cdk8s.Chart {
+export class SearchOnEKS extends cdk8s.Chart {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 

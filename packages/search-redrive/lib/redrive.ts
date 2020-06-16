@@ -19,12 +19,12 @@ export class Redrive extends Construct {
         AWS_REGION: std.EnvValue.of('us-east-1'),
         TABLE_NAME: std.EnvValue.fromConfigMap(awsResources, 'tableName'),
         QUEUE_URL: std.EnvValue.fromConfigMap(awsResources, 'queueUrl'),
-      }
+      },
     });
 
     const app = new std.ConfigMap(this, 'app');
     app.addDirectory(`${__dirname}/app`, {
-      exclude: [ '*.ts' ]
+      exclude: [ '*.ts' ],
     });
 
     const entrypointVolume = std.Volume.fromConfigMap(app);

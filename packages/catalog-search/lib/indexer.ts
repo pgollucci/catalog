@@ -21,10 +21,11 @@ export class Indexer extends Construct {
     const entrypointPath = '/var/app';
 
     const container = new stdk8s.Container({
-      image: 'node',
+      image: 'node:12.18.0-stretch',
       command: [ '/bin/sh', `${entrypointPath}/entrypoint.sh` ],
       workingDir: entrypointPath,
       env: {
+        AWS_REGION: stdk8s.EnvValue.fromValue('us-east-1'),
         QUEUE_URL: stdk8s.EnvValue.fromConfigMap(props.awsResourcesConfig, 'queueUrl'),
         ELASTIC_ENDPOINT: stdk8s.EnvValue.fromValue(props.elasticsearch.endpoint),
         ELASTIC_PASSWORD: props.elasticsearch.password,
@@ -38,8 +39,6 @@ export class Indexer extends Construct {
         container.addEnv(key, stdk8s.EnvValue.fromSecret(props.awsCredsSecret!, key));
       }
 
-      addEnv('AWS_REGION');
-      addEnv('AWS_ACCOUNT');
       addEnv('AWS_ACCESS_KEY_ID');
       addEnv('AWS_SECRET_ACCESS_KEY');
       addEnv('AWS_SESSION_TOKEN');

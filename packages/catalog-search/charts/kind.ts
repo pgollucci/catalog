@@ -6,7 +6,7 @@ import { Elasticsearch } from '../lib/elasticsearch';
 import { Kibana } from '../lib/kibana';
 import { Indexer } from '../lib/indexer';
 
-export class CatalogSearchDev extends Chart {
+export class SearchOnKind extends Chart {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 
@@ -26,8 +26,6 @@ export class CatalogSearchDev extends Chart {
     // by the deployment of the catalog.
     const awsCredsSecret = new stdk8s.Secret(this, 'Secret', {})
 
-    awsCredsSecret.addEnvVariable('AWS_REGION');
-    awsCredsSecret.addEnvVariable('AWS_ACCOUNT');
     awsCredsSecret.addEnvVariable('AWS_ACCESS_KEY_ID');
     awsCredsSecret.addEnvVariable('AWS_SECRET_ACCESS_KEY');
     awsCredsSecret.addEnvVariable('AWS_SESSION_TOKEN');

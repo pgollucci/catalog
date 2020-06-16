@@ -36,22 +36,22 @@ async function queueItem(body: string) {
 
 function renderBody(item: aws.DynamoDB.AttributeMap) {
   return JSON.stringify({
-    "Message" : renderMessage(item),
+    'Message' : renderMessage(item),
   }, undefined, 2);
 }
 
 function renderMessage(item: aws.DynamoDB.AttributeMap) {
   return JSON.stringify({
-    "dynamodb": {
-      "Keys": {
-        "name": {
-          "S": item.name.S
+    'dynamodb': {
+      'Keys': {
+        'name': {
+          'S': item.name.S,
         },
-        "version": {
-          "S": item.version.S
-        }
+        'version': {
+          'S': item.version.S,
+        },
       },
-      "NewImage": item,
+      'NewImage': item,
     },
   });
 }

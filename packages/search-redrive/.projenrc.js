@@ -9,13 +9,13 @@ const project = new TypeScriptLibraryProject({
   authorEmail: 'benisrae@amazon.com',
   devDependencies: {
     '@types/node': Semver.caret('13.9.8'),
-    'cdk8s-cli': Semver.caret('0.25.0'),
-    'aws-sdk': Semver.caret('2.696.0'),
+    'cdk8s-cli': Semver.caret('0.25.0')
   },
   dependencies: {
     'cdk8s': Semver.caret('0.25.0'),
     'constructs': Semver.caret('2.0.0'),
-    'stdk8s': Semver.caret('0.0.0')
+    'stdk8s': Semver.caret('0.0.0'),
+    'aws-sdk': Semver.caret('2.696.0'),
   },
   buildWorkflow: false,
   releaseWorkflow: false,
@@ -26,8 +26,5 @@ project.addScripts({
 });
 
 project.gitignore.exclude('dist/');
-
-new Jest(project);
-new Eslint(project);
 
 project.synth();
