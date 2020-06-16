@@ -1,16 +1,14 @@
 import { Construct } from 'constructs';
-import { Dashboard } from '../lib/dashboard';
-import { Elasticsearch } from '../lib/elasticsearch';
+import * as cdk8s from 'cdk8s';
 import { Kibana } from '../lib/kibana';
+import { Elasticsearch } from '../lib/elasticsearch';
 import { Indexer } from '../lib/indexer';
+import * as stdk8s from 'stdk8s';
 
 
-export class Search extends Construct {
-
+export class CatalogSearch extends cdk8s.Chart {
   constructor(scope: Construct, name: string) {
     super(scope, name);
-
-    new Dashboard(this, 'Dashboard');
 
     const elasticsearch = new Elasticsearch(this, 'Elasticsearch');
 
@@ -18,7 +16,10 @@ export class Search extends Construct {
 
     new Indexer(this, 'Indexer', {
       elasticsearch: elasticsearch,
+      awsResourcesConfig: stdk8s.ConfigMap.fromConfigMapName('aws-resources'),
+      awsServiceAccont: stdk8s.ServiceAccount.fromServiceAccountName('search'),
     })
-  }
 
+
+  }
 }

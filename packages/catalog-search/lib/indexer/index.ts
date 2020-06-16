@@ -15,6 +15,7 @@ const elasticEndpoint = readEnv('ELASTIC_ENDPOINT');
 const elasticPassword = readEnv('ELASTIC_PASSWORD');
 const elasticUsername = readEnv('ELASTIC_USERNAME');
 
+
 const sqs = new aws.SQS();
 const client = new elastic.Client({
   node: elasticEndpoint,

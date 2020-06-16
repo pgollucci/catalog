@@ -30,7 +30,7 @@ project.addScripts({
   "kind:delete": "kind/delete-cluster.sh",
   "kind:recreate": "npm run kind:delete && npm run kind:create",
   "kind:connect": "kubectl config use-context kind-kind",
-  "kind:apply": "npm run synth && kubectl apply -f dist/catalogsearchdev.k8s.yaml",
+  "kind:apply": "npm run synth && kubectl apply -f dist/catalogsearchkind.k8s.yaml",
   "eks:connect": "kubectl config use-context arn:aws:eks:us-east-1:499430655523:cluster/SearchKubernetes8BEC1CD3-fb8a111e81ac46d998c4d56666e588ba",
   "kube:dashboard-token": "kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep adminuser | awk '{print $1}')",
   "kube:elastic-password": "kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}'",

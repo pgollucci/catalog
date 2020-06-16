@@ -6,6 +6,12 @@ export interface IndexerProps {
 
   readonly elasticsearch: Elasticsearch;
 
+  readonly awsResourcesConfig: stdk8s.IConfigMap;
+
+  readonly awsCredsSecret?: stdk8s.ISecret;
+
+  readonly awsServiceAccont?: stdk8s.IServiceAccount;
+
 }
 
 export class Indexer extends Construct {
@@ -14,19 +20,30 @@ export class Indexer extends Construct {
 
     const entrypointPath = '/var/app';
 
-    const awsResources = stdk8s.ConfigMap.fromConfigMapName('aws-resources');
-
     const container = new stdk8s.Container({
       image: 'node',
       command: [ '/bin/sh', `${entrypointPath}/entrypoint.sh` ],
       workingDir: entrypointPath,
       env: {
-        QUEUE_URL: stdk8s.EnvValue.fromConfigMap(awsResources, 'queueUrl'),
+        QUEUE_URL: stdk8s.EnvValue.fromConfigMap(props.awsResourcesConfig, 'queueUrl'),
         ELASTIC_ENDPOINT: stdk8s.EnvValue.fromValue(props.elasticsearch.endpoint),
         ELASTIC_PASSWORD: props.elasticsearch.password,
         ELASTIC_USERNAME: stdk8s.EnvValue.fromValue(props.elasticsearch.username),
       },
     });
+
+    if (props.awsCredsSecret) {
+
+      function addEnv(key: string) {
+        container.addEnv(key, stdk8s.EnvValue.fromSecret(props.awsCredsSecret!, key));
+      }
+
+      addEnv('AWS_REGION');
+      addEnv('AWS_ACCOUNT');
+      addEnv('AWS_ACCESS_KEY_ID');
+      addEnv('AWS_SECRET_ACCESS_KEY');
+      addEnv('AWS_SESSION_TOKEN');
+    }
 
     const app = new stdk8s.ConfigMap(this, 'app');
     app.addDirectory(`${__dirname}/indexer`, {
@@ -41,7 +58,9 @@ export class Indexer extends Construct {
       volume: entrypointVolume,
     }));
 
-    const podSpec = new stdk8s.PodSpec({})
+    const podSpec = new stdk8s.PodSpec({
+      serviceAccout: props.awsServiceAccont,
+    })
 
     podSpec.addContainer(container);
     podSpec.addVolume(entrypointVolume);
