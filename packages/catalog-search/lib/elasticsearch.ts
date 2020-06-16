@@ -1,28 +1,19 @@
-import { Construct, Node } from "constructs";
+import { Construct, Node } from 'constructs';
 import * as cdk8s from 'cdk8s';
 import * as eck from '../imports/elasticsearch.k8s.elastic.co/elasticsearch';
-// import * as k8s from '../imports/k8s';
-// import fs = require('fs');
-// import path = require('path');
+import * as stdk8s from 'stdk8s';
 
 
 export class Elasticsearch extends Construct {
 
   private cr: eck.Elasticsearch;
+  private readonly secret: stdk8s.ISecret;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    // const ca = new k8s.Secret(this, 'Secret', {
-    //   data: {
-    //     'ca.crt': fs.readFileSync(path.join(__dirname, 'tls', 'ca.crt')).toString('base64'),
-    //     'tls.crt': fs.readFileSync(path.join(__dirname, 'tls', 'tls.crt')).toString('base64'),
-    //     'tls.key': fs.readFileSync(path.join(__dirname, 'tls', 'tls.key')).toString('base64')
-    //   }
-    // });
-
     const crd = new cdk8s.Include(this, 'ElasticsearchOperator', {
-      url: 'https://download.elastic.co/downloads/eck/1.1.2/all-in-one.yaml'
+      url: 'https://download.elastic.co/downloads/eck/1.1.2/all-in-one.yaml',
     })
 
     this.cr = new eck.Elasticsearch(this, 'Elasticsearch', {
@@ -32,6 +23,15 @@ export class Elasticsearch extends Construct {
       spec: {
         version: '7.7.1',
         http: {
+          service: {
+            spec: {
+              ports: [
+                {
+                  port: 9200,
+                },
+              ],
+            },
+          },
           tls: {
             selfSignedCertificate: {
               disabled: true,
@@ -48,12 +48,14 @@ export class Elasticsearch extends Construct {
               'node.ingest': true,
               'node.store.allow_mmap': false,
               'xpack.security.enabled': true,
-              'xpack.security.http.ssl.enabled': false
-            }
-          }
-        ]
-      }
+              'xpack.security.http.ssl.enabled': false,
+            },
+          },
+        ],
+      },
     })
+
+    this.secret = stdk8s.Secret.fromSecretName('elasticsearch-es-elastic-user');
 
     Node.of(this.cr).addDependency(crd);
 
@@ -61,6 +63,18 @@ export class Elasticsearch extends Construct {
 
   public get name(): string {
     return this.cr.name;
+  }
+
+  public get username(): string {
+    return 'elastic';
+  }
+
+  public get endpoint(): string {
+    return 'http://elasticsearch-es-http:9200'
+  }
+
+  public get password(): stdk8s.EnvValue {
+    return stdk8s.EnvValue.fromSecret(this.secret, 'elastic');
   }
 
 }
