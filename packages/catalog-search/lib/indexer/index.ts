@@ -128,7 +128,7 @@ function parseMessage(message: aws.SQS.Message) {
 
   if (typeof(document) !== 'object') {
     // some messages (I counted 3) have strange values in the 'json' field...
-    // skip those for now.
+    // skip those for now. They cause the document spread to blow up with properties.
     log("Detected message with a non object value in 'json' property", message)
     return undefined;
   }
