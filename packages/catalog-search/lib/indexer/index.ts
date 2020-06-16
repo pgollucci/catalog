@@ -10,6 +10,10 @@ function readEnv(key: string): string {
 
 }
 
+function log(...args: any[]) {
+  console.log(new Date().toISOString(), ...args);
+}
+
 const queueUrl = readEnv('QUEUE_URL');
 const elasticEndpoint = readEnv('ELASTIC_ENDPOINT');
 const elasticPassword = readEnv('ELASTIC_PASSWORD');
@@ -27,7 +31,7 @@ const client = new elastic.Client({
 
 async function recieve() {
 
-  console.log(`Receiving messages from ${queueUrl}...`)
+  log(`Receiving messages from ${queueUrl}...`)
 
   const receiveParams: aws.SQS.ReceiveMessageRequest = {
     QueueUrl: queueUrl!,
@@ -40,7 +44,7 @@ async function recieve() {
     try {
 
       if (err) {
-        console.log('Failed recieving messages', err);
+        log('Failed recieving messages', err);
         return;
       }
 
@@ -54,7 +58,7 @@ async function recieve() {
           } catch (err) {
             // sometimes the messages have an invalid format, lets just log these for now
             // and continue to the rest.
-            console.log('Invalid message format', message, err);
+            log('Invalid message format', message, err);
             continue;
           }
 
@@ -62,7 +66,7 @@ async function recieve() {
             try {
               await index(document);
             } catch (err) {
-              console.log('Failed indexing message', err, message);
+              log('Failed indexing message', err, message);
               continue;
             }
           }
@@ -74,7 +78,7 @@ async function recieve() {
 
           sqs.deleteMessage(deleteParams, function(err, _) {
             if (err) {
-              console.log('Failed deleting message', err, message);
+              log('Failed deleting message', err, message);
             }
           });
 
@@ -100,7 +104,7 @@ async function index(document: any) {
       body: document,
     }
     await client.index(doc1)
-    console.log(`Successfully indexed document ${doc1.id}`)
+    log(`Successfully indexed document ${doc1.id}`)
   } catch (err) {
     if (err.body) {
       throw new Error(`${err.message}: ${err.body.error.reason}: ${JSON.stringify(document)}`)
@@ -122,6 +126,13 @@ function parseMessage(message: aws.SQS.Message) {
 
   const document = JSON.parse(image.json.S);
 
+  if (typeof(document) !== 'object') {
+    // some messages (I counted 3) have strange values in the 'json' field...
+    // skip those for now.
+    log("Detected message with a non object value in 'json' property", message)
+    return undefined;
+  }
+
   // this conflicts with elastic's '_id'.
   delete document._id;
 
@@ -130,6 +141,17 @@ function parseMessage(message: aws.SQS.Message) {
   // https://github.com/nodejs/help/issues/2303#issuecomment-626828862
   delete document.bundleDependencies
   delete document.bundledDependencies
+
+  // these are just causing too many properties to be created.
+  // which eventually crosses the default 1000 fields per index.
+  // lets filter them for now and later we should come up with
+  // an include list.
+  delete document.devDependencies
+  delete document.peerDependencies
+  delete document.jsii
+  delete document.eslintConfig
+  delete document.jest
+  delete document.scripts
 
   return { tweetId: image.tweetid.S, ...document};
 
