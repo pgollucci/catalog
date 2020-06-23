@@ -5,6 +5,7 @@ import { Dashboard } from '../lib/dashboard';
 import { Elasticsearch } from '../lib/elasticsearch';
 import { Kibana } from '../lib/kibana';
 import { Indexer } from '../lib/indexer';
+import { Redrive } from '../lib/redrive';
 
 export class SearchOnKind extends Chart {
   constructor(scope: Construct, name: string) {
@@ -18,17 +19,14 @@ export class SearchOnKind extends Chart {
       },
       data: {
         queueUrl: kplus.EnvValue.fromProcess('QUEUE_URL', {required: true}).value,
+        tableName: kplus.EnvValue.fromProcess('TABLE_NAME', {required: true}).value,
       },
     })
 
-    // we also need to create a secret for aws creds.
-    // in production this comes automatically from an existing service account which is also created
-    // by the deployment of the catalog.
-    const awsCredsSecret = new kplus.Secret(this, 'Secret', {})
-
-    awsCredsSecret.addStringData('AWS_ACCESS_KEY_ID', process.env.AWS_ACCESS_KEY_ID!);
-    awsCredsSecret.addStringData('AWS_SECRET_ACCESS_KEY', process.env.AWS_SECRET_ACCESS_KEY!);
-    awsCredsSecret.addStringData('AWS_SESSION_TOKEN', process.env.AWS_SESSION_TOKEN!);
+    // this secret is created in 'create-kind-cluster.sh' and uses local enviornment
+    // variables. otherwise, creating the secret here would mean storing the creds
+    // on disk in clear text.
+    const awsCredsSecret = kplus.Secret.fromSecretName('aws-creds');
 
     // lets add a dashboard to our dev environment.
     new Dashboard(this, 'Dashboard');
@@ -39,6 +37,11 @@ export class SearchOnKind extends Chart {
 
     new Indexer(this, 'Indexer', {
       elasticsearch: elasticsearch,
+      awsResourcesConfig: awsResourcesConfig,
+      awsCredsSecret: awsCredsSecret,
+    })
+
+    new Redrive(this, 'Redrive', {
       awsResourcesConfig: awsResourcesConfig,
       awsCredsSecret: awsCredsSecret,
     })

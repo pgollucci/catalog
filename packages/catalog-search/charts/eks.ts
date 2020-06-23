@@ -4,6 +4,7 @@ import { Kibana } from '../lib/kibana';
 import { Elasticsearch } from '../lib/elasticsearch';
 import { Indexer } from '../lib/indexer';
 import * as kplus from 'cdk8s-plus';
+import { Redrive } from '../lib/redrive';
 
 
 export class SearchOnEKS extends cdk8s.Chart {
@@ -14,10 +15,18 @@ export class SearchOnEKS extends cdk8s.Chart {
 
     new Kibana(this, 'Kibana', { elasticsearch: elasticsearch })
 
+    const awsResources = kplus.ConfigMap.fromConfigMapName('aws-resources');
+    const awsServiceAccount = kplus.ServiceAccount.fromServiceAccountName('search');
+
     new Indexer(this, 'Indexer', {
       elasticsearch: elasticsearch,
-      awsResourcesConfig: kplus.ConfigMap.fromConfigMapName('aws-resources'),
-      awsServiceAccont: kplus.ServiceAccount.fromServiceAccountName('search'),
+      awsResourcesConfig: awsResources,
+      awsServiceAccont: awsServiceAccount,
+    })
+
+    new Redrive(this, 'Redrive', {
+      awsResourcesConfig: awsResources,
+      awsServiceAccont: awsServiceAccount,
     })
 
 
