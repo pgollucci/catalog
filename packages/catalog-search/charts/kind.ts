@@ -7,8 +7,13 @@ import { Kibana } from '../lib/kibana';
 import { Indexer } from '../lib/indexer';
 import { Redrive } from '../lib/redrive';
 
+export interface SearchOnKindProps {
+
+  readonly queueUrl: string;
+}
+
 export class SearchOnKind extends Chart {
-  constructor(scope: Construct, name: string) {
+  constructor(scope: Construct, name: string, props: SearchOnKindProps) {
     super(scope, name);
 
     // in dev we need to create the aws-resources config map.
@@ -18,7 +23,7 @@ export class SearchOnKind extends Chart {
         name: 'aws-resources',
       },
       data: {
-        queueUrl: kplus.EnvValue.fromProcess('QUEUE_URL', {required: true}).value,
+        queueUrl: props.queueUrl,
         tableName: kplus.EnvValue.fromProcess('TABLE_NAME', {required: true}).value,
       },
     })

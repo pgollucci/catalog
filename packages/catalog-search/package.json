@@ -27,7 +27,7 @@
     "kind:recreate": "npm run kind:delete && npm run kind:create",
     "kind:redeploy": "npm run kind:recreate && npm run kind:connect && npm run kind:apply && npm run kube:wait",
     "kind:connect": "kubectl config use-context kind-kind",
-    "kind:apply": "npm run synth && npm run kind:connect && kubectl apply -f dist/catalogsearchkind.k8s.yaml",
+    "kind:apply": "npm run synth && npm run kind:connect && npm run cdk:deploy && kubectl apply -f dist/catalogsearchkind.k8s.yaml",
     "kind:redrive": "npm run kind:connect && kubectl delete job $(kubectl get -A jobs | grep redrive | awk '{print $2}') && npm run kind:apply",
     "eks:connect": "kubectl config use-context arn:aws:eks:${AWS_REGION}:${AWS_ACCOUNT}:cluster/SearchKubernetes8BEC1CD3-fb8a111e81ac46d998c4d56666e588ba",
     "eks:apply": "npm run synth && npm run eks:connect && kubectl apply -f dist/catalogsearcheks.k8s.yaml",
@@ -41,7 +41,8 @@
     "kube:redrive-logs": "kubectl logs $(kubectl get -A pods | grep redrive | awk '{print $2}')",
     "kube:wait": "kubectl --all-namespaces --all=true wait --for=condition=Ready pod --timeout=5m",
     "kube:proxy": "kubectl proxy",
-    "kube:dashboard": "npm run kube:dashboard-token && npm run kube:proxy"
+    "kube:dashboard": "npm run kube:dashboard-token && npm run kube:proxy",
+    "cdk:deploy": "cdk deploy -a ./cdk.out"
   },
   "author": {
     "name": "Eli Polonsky",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@types/node": "^10.17.0",
     "cdk8s-cli": "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17",
+    "aws-cdk": "1.45.0",
     "projen": "^0.2.2",
     "standard-version": "^8.0.0",
     "jest": "^26.0.1",
