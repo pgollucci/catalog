@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import * as stdk8s from 'stdk8s';
+import * as stdk8s from 'cdk8s-plus';
 import { Elasticsearch } from './elasticsearch';
 
 export interface IndexerProps {

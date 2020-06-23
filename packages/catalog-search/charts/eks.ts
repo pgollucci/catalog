@@ -3,7 +3,7 @@ import * as cdk8s from 'cdk8s';
 import { Kibana } from '../lib/kibana';
 import { Elasticsearch } from '../lib/elasticsearch';
 import { Indexer } from '../lib/indexer';
-import * as stdk8s from 'stdk8s';
+import * as kplus from 'cdk8s-plus';
 
 
 export class SearchOnEKS extends cdk8s.Chart {
@@ -16,8 +16,8 @@ export class SearchOnEKS extends cdk8s.Chart {
 
     new Indexer(this, 'Indexer', {
       elasticsearch: elasticsearch,
-      awsResourcesConfig: stdk8s.ConfigMap.fromConfigMapName('aws-resources'),
-      awsServiceAccont: stdk8s.ServiceAccount.fromServiceAccountName('search'),
+      awsResourcesConfig: kplus.ConfigMap.fromConfigMapName('aws-resources'),
+      awsServiceAccont: kplus.ServiceAccount.fromServiceAccountName('search'),
     })
 
 

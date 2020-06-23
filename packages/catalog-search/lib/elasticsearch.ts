@@ -1,7 +1,7 @@
 import { Construct, Node } from 'constructs';
 import * as cdk8s from 'cdk8s';
 import * as eck from '../imports/elasticsearch.k8s.elastic.co/elasticsearch';
-import * as stdk8s from 'stdk8s';
+import * as stdk8s from 'cdk8s-plus';
 
 
 export class Elasticsearch extends Construct {

@@ -11,13 +11,15 @@
   "scripts": {
     "projen": "node .projenrc.js && yarn install",
     "projen:upgrade": "yarn upgrade projen && yarn projen",
-    "test": "jest && yarn eslint",
+    "test": "jest --passWithNoTests && yarn eslint",
     "bump": "standard-version",
     "release": "yarn bump && git push --follow-tags origin master",
     "compile": "tsc",
     "watch": "tsc -w",
     "package": "rm -fr dist && mkdir -p dist/js && yarn pack && mv *.tgz dist/js/",
-    "build": "yarn compile && yarn test && yarn run package",
+    "build": "yarn compile && yarn test",
+    "test:watch": "jest --watch",
+    "test:update": "jest -u",
     "eslint": "eslint . --ext .ts",
     "synth": "npm run compile && cdk8s synth",
     "kind:create": "scripts/create-kind-cluster.sh",
@@ -43,12 +45,13 @@
     "email": "epolon@amazon.com"
   },
   "devDependencies": {
-    "@types/node": "^10.0.0",
-    "cdk8s-cli": "^0.25.0",
-    "projen": "^0.1.27",
+    "@types/node": "^10.17.0",
+    "cdk8s-cli": "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17",
+    "projen": "^0.2.2",
     "standard-version": "^8.0.0",
     "jest": "^26.0.1",
     "@types/jest": "^25.2.1",
+    "ts-jest": "^26.1.0",
     "typescript": "^3.9.5",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.19.2",
@@ -60,27 +63,33 @@
   },
   "peerDependencies": {},
   "dependencies": {
-    "cdk8s": "^0.25.0",
+    "cdk8s": "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17",
     "constructs": "^2.0.0",
-    "stdk8s": "^0.0.0",
+    "cdk8s-plus": "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17",
     "aws-sdk": "^2.696.0",
     "@elastic/elasticsearch": "^7.7.1"
   },
   "bundledDependencies": [],
-  "engines": {
-    "node": ">= 10.0.0"
-  },
   "license": "Apache-2.0",
   "version": "0.0.0",
   "jest": {
     "clearMocks": true,
     "collectCoverage": true,
-    "coverageDirectory": "coverage",
     "coveragePathIgnorePatterns": [
       "/node_modules/"
     ],
-    "moduleFileExtensions": [
-      "js"
-    ]
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "preset": "ts-jest",
+    "testMatch": [
+      "**/__tests__/**/*.ts?(x)",
+      "**/?(*.)+(spec|test).ts?(x)"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    }
   }
 }

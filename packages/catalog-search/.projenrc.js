@@ -1,5 +1,7 @@
 const { TypeScriptLibraryProject, Semver } = require('projen');
 
+const cdk8sVersion = Semver.pinned('0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17');
+
 const project = new TypeScriptLibraryProject({
   name: 'catalog-search',
   commitPackageJson: true,
@@ -11,12 +13,12 @@ const project = new TypeScriptLibraryProject({
   authorEmail: 'epolon@amazon.com',
   devDependencies: {
     '@types/node': Semver.caret('13.9.8'),
-    'cdk8s-cli': Semver.caret('0.25.0')
+    'cdk8s-cli': cdk8sVersion
   },
   dependencies: {
-    'cdk8s': Semver.caret('0.25.0'),
+    'cdk8s': cdk8sVersion,
     'constructs': Semver.caret('2.0.0'),
-    'stdk8s': Semver.caret('0.0.0'),
+    'cdk8s-plus': cdk8sVersion,
     'aws-sdk': Semver.caret('2.696.0'),
     '@elastic/elasticsearch': Semver.caret('7.7.1')
   },
@@ -43,6 +45,7 @@ project.addScripts({
   "kube:proxy": "kubectl proxy",
   "kube:dashboard": "npm run kube:dashboard-token && npm run kube:proxy",
   "elastic:ping": "curl -u \"elastic:$(kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')\" -k http://localhost:9200",
+  "build": "yarn compile && yarn test" // no need to package
 });
 
 project.gitignore.exclude('dist/');
