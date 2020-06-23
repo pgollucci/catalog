@@ -13,11 +13,11 @@ export class SearchOnKind extends Chart {
     // in dev we need to create the aws-resources config map.
     // in production this config map already exists in the cluster by the deployment of the catalog itself.
     const awsResourcesConfig = new kplus.ConfigMap(this, 'ConfigMap', {
-      metadata: new kplus.ObjectMeta({
+      metadata: {
         name: 'aws-resources',
-      }),
+      },
       data: {
-        queueUrl: kplus.EnvValue.fromProcess({key: 'QUEUE_URL', required: true}).value,
+        queueUrl: kplus.EnvValue.fromProcess('QUEUE_URL', {required: true}).value,
       },
     })
 
@@ -26,9 +26,9 @@ export class SearchOnKind extends Chart {
     // by the deployment of the catalog.
     const awsCredsSecret = new kplus.Secret(this, 'Secret', {})
 
-    awsCredsSecret.addEnvVariable('AWS_ACCESS_KEY_ID');
-    awsCredsSecret.addEnvVariable('AWS_SECRET_ACCESS_KEY');
-    awsCredsSecret.addEnvVariable('AWS_SESSION_TOKEN');
+    awsCredsSecret.addStringData('AWS_ACCESS_KEY_ID', process.env.AWS_ACCESS_KEY_ID!);
+    awsCredsSecret.addStringData('AWS_SECRET_ACCESS_KEY', process.env.AWS_SECRET_ACCESS_KEY!);
+    awsCredsSecret.addStringData('AWS_SESSION_TOKEN', process.env.AWS_SESSION_TOKEN!);
 
     // lets add a dashboard to our dev environment.
     new Dashboard(this, 'Dashboard');

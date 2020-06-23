@@ -19,7 +19,7 @@ export class Redrive extends Construct {
       command: [ '/bin/sh', `${entrypointPath}/${entrypointFile}` ],
       workingDir: entrypointPath,
       env: {
-        AWS_REGION: kplus.EnvValue.of('us-east-1'),
+        AWS_REGION: kplus.EnvValue.fromValue('us-east-1'),
         TABLE_NAME: kplus.EnvValue.fromConfigMap(awsResources, 'tableName'),
         QUEUE_URL: kplus.EnvValue.fromConfigMap(awsResources, 'queueUrl'),
       },
@@ -32,22 +32,17 @@ export class Redrive extends Construct {
 
     const entrypointVolume = kplus.Volume.fromConfigMap(app);
 
-    container.mount(new kplus.VolumeMount({
-      path: entrypointPath,
-      volume: entrypointVolume,
-    }));
+    container.mount(entrypointPath, entrypointVolume);
 
     new kplus.Job(this, 'redrive', {
-      spec: new kplus.JobSpec({
+      spec: {
         ttlAfterFinished: kplus.Duration.seconds(5), // delete job after finished
-        template: new kplus.PodTemplateSpec({
-          podSpec: new kplus.PodSpec({
-            volumes: [ entrypointVolume ],
-            serviceAccout: kplus.ServiceAccount.fromServiceAccountName('search'),
-            containers: [ container ],
-          }),
-        }),
-      }),
+        podSpecTemplate: {
+          volumes: [ entrypointVolume ],
+          serviceAccount: kplus.ServiceAccount.fromServiceAccountName('search'),
+          containers: [ container ],
+        },
+      },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Construct } from "constructs";
+import { Construct } from 'constructs';
 import * as k8s from '../imports/k8s';
 
 export interface AdminUserProps {
@@ -11,7 +11,7 @@ export class AdminUser extends Construct {
     super(scope, name);
 
     const user = new k8s.ServiceAccount(this, 'AdminUser', {
-      metadata: { namespace: props.namespace }
+      metadata: { namespace: props.namespace },
     });
 
     const role = new k8s.ClusterRole(this, 'ClusterRole', {
@@ -19,28 +19,28 @@ export class AdminUser extends Construct {
         {
           apiGroups: ['*'],
           resources: ['*'],
-          verbs: ['*']
+          verbs: ['*'],
         },
         {
           nonResourceURLs: ['*'],
-          verbs: ['*']
-        }
-      ]
+          verbs: ['*'],
+        },
+      ],
     });
 
     new k8s.ClusterRoleBinding(this, 'AdminUserClusterRoleBinding', {
       roleRef: {
         apiGroup: 'rbac.authorization.k8s.io',
         kind: 'ClusterRole',
-        name: role.name
+        name: role.name,
       },
       subjects: [
         {
           kind: 'ServiceAccount',
           name: user.name,
-          namespace: props.namespace
-        }
-      ]
+          namespace: props.namespace,
+        },
+      ],
     });
 
   }

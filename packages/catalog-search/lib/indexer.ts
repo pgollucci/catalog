@@ -51,26 +51,18 @@ export class Indexer extends Construct {
 
     const entrypointVolume = stdk8s.Volume.fromConfigMap(app);
 
+    container.mount(entrypointPath, entrypointVolume);
 
-    container.mount(new stdk8s.VolumeMount({
-      path: entrypointPath,
-      volume: entrypointVolume,
-    }));
-
-    const podSpec = new stdk8s.PodSpec({
-      serviceAccout: props.awsServiceAccont,
-    })
-
-    podSpec.addContainer(container);
-    podSpec.addVolume(entrypointVolume);
-
-    new stdk8s.Deployment(this, 'Deployment', {
-      spec: new stdk8s.DeploymentSpec({
+    const d = new stdk8s.Deployment(this, 'Deployment', {
+      spec: {
         replicas: 1,
-        template: new stdk8s.PodTemplateSpec({
-          podSpec: podSpec,
-        }),
-      }),
-    })
+        podSpecTemplate: {
+          serviceAccount: props.awsServiceAccont,
+        },
+      },
+    });
+
+    d.spec.podSpecTemplate.addContainer(container);
+    d.spec.podSpecTemplate.addVolume(entrypointVolume);
   }
 }
