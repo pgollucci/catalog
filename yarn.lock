@@ -3976,7 +3976,7 @@ available-typed-arrays@^1.0.0, available-typed-arrays@^1.0.2:
   dependencies:
     array-filter "^1.0.0"
 
-aws-cdk@^1.45.0:
+aws-cdk@1.45.0, aws-cdk@^1.45.0:
   version "1.45.0"
   resolved "https://registry.yarnpkg.com/aws-cdk/-/aws-cdk-1.45.0.tgz#d2cfdf910f161cdb9c2300892953a004c90a179d"
   integrity sha512-Y/h11zpbwDYeDW8d/E04LRwPFnRAk2glxVnvXqsmvso+e1F1jTHRgIohVYVOudi2GwJJ5yddIgNh/Wjck6V4pg==
@@ -4853,15 +4853,15 @@ cdk-assets@1.45.0:
     glob "^7.1.6"
     yargs "^15.3.1"
 
-cdk8s-cli@0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17:
-  version "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17"
-  resolved "https://registry.yarnpkg.com/cdk8s-cli/-/cdk8s-cli-0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17.tgz#6de4c75516580792fc81ce0a743cc5f40653d26f"
-  integrity sha512-6sIGqbqAfIO2rUuozSQ69LJQV0QzEbndP3pOs02hFCvGrUZRuWsgLqOCRAr1VpyZSNZhPo7T8/I5ctRTTFCAWw==
+cdk8s-cli@0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c:
+  version "0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c"
+  resolved "https://registry.yarnpkg.com/cdk8s-cli/-/cdk8s-cli-0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c.tgz#648c5e2bf7addc18f9a28720760b7c426c9fcae4"
+  integrity sha512-rdXO5bUacclYfuIkO2jWtbm+zf1rMtY1ER5bciUSIW0PWjyjQt2UOrWkMJIXhQVPmHsj0Fqz88NK1dycBzu97w==
   dependencies:
     "@types/node" "13.7.0"
-    cdk8s "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17"
+    cdk8s "0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c"
     codemaker "^0.22.0"
-    constructs "^2.0.1"
+    constructs "2.0.1"
     fs-extra "^8.1.0"
     jsii-srcmak "^0.1.4"
     json2jsii "^0.1.2"
@@ -4869,18 +4869,18 @@ cdk8s-cli@0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17:
     yaml "^1.7.2"
     yargs "^15.1.0"
 
-cdk8s-plus@0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17:
-  version "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17"
-  resolved "https://registry.yarnpkg.com/cdk8s-plus/-/cdk8s-plus-0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17.tgz#8157dcb538afc5f80a769803deddf061ceb48571"
-  integrity sha512-mPbjCdnRywNsgYEC/MDb1vx3wRRZm2RBlN89lIlf6h8IWhYtrfne3BIyZsQG0tQQGppSPvh2oshwV3hmaj2U0w==
+cdk8s-plus@0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c:
+  version "0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c"
+  resolved "https://registry.yarnpkg.com/cdk8s-plus/-/cdk8s-plus-0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c.tgz#2afd7a2cd3f37a57c63b6c98f803b6758cd2b352"
+  integrity sha512-6C6hfXsoM43qhX9qf1UbyhgTYsgCG/HTg3ng6TiwewukKUDnIR72wl5x7pPuu5OgmrEqfF05XYZrs/A+QI4jZA==
   dependencies:
-    cdk8s "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17"
+    cdk8s "0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c"
     minimatch "^3.0.4"
 
-cdk8s@0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17:
-  version "0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17"
-  resolved "https://registry.yarnpkg.com/cdk8s/-/cdk8s-0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17.tgz#a9de80e62b11d03d65f4fd5a94ed96c544e3cd75"
-  integrity sha512-BqvHF0wT+MAvf/fkrxyJFtvbSlX9Afj+Mk+xV6vEW3VS7h/4OZl0jl5A/CP1NfW6+/rSHmxuaez218lkzUtr0A==
+cdk8s@0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c:
+  version "0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c"
+  resolved "https://registry.yarnpkg.com/cdk8s/-/cdk8s-0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c.tgz#c65273541737bf1ed0f0b16e3bf3e8d5d043b48c"
+  integrity sha512-3IfkwqExfgS7NwAdieSmrQoyx1LBpIUHUgAdM303bQarzZvdfMfdjJeW+wyLOgLMQ7a9OqQsJObogm9/dE/jRg==
   dependencies:
     follow-redirects "^1.11.0"
     json-stable-stringify "^1.0.1"
@@ -5339,7 +5339,7 @@ constants-browserify@^1.0.0:
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
   integrity sha1-wguW2MYXdIqvHBYCF2DNJ/y4y3U=
 
-constructs@2.0.1, constructs@^2.0.0, constructs@^2.0.1:
+constructs@2.0.1, constructs@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/constructs/-/constructs-2.0.1.tgz#274d6b8ce6a698813495c444466b0c745349ddb5"
   integrity sha512-edR85YFGI9TBT9byAo5vAfI0PRi+jFGzinwN3RAJwKfv6Yc9x9kALYfoEmgotp95qT7/k/iUQWHrH9BMJeqpdg==

@@ -1,6 +1,6 @@
 const { TypeScriptLibraryProject, Semver } = require('projen');
 
-const cdk8sVersion = Semver.pinned('0.25.0-pre.2b30557056d5d0b3c3ee91d376e546bed74fdb17');
+const cdk8sVersion = Semver.pinned('0.25.0-pre.e321970927ea855b65aa0b72ec3ff028981c044c');
 const awsCdkVersion = Semver.pinned('1.45.0');
 
 const project = new TypeScriptLibraryProject({
