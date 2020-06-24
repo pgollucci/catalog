@@ -30,17 +30,17 @@ const project = new TypeScriptLibraryProject({
 });
 
 project.addScripts({
-  "synth": "npm run compile && cdk8s synth",
+  "synth": "yarn compile && cdk8s synth",
   "kind:create": "scripts/create-kind-cluster.sh",
   "kind:delete": "scripts/delete-kind-cluster.sh",
-  "kind:recreate": "npm run kind:delete && npm run kind:create",
-  "kind:redeploy": "npm run kind:recreate && npm run kind:connect && npm run kind:apply && npm run kube:wait",
+  "kind:recreate": "yarn kind:delete && yarn kind:create",
+  "kind:redeploy": "yarn kind:recreate && yarn kind:connect && yarn kind:apply && yarn kube:wait",
   "kind:connect": "kubectl config use-context kind-kind",
-  "kind:apply": "npm run synth && npm run kind:connect && npm run cdk:deploy && kubectl apply -f dist/catalogsearchkind.k8s.yaml",
-  "kind:redrive": "npm run kind:connect && kubectl delete job $(kubectl get -A jobs | grep redrive | awk '{print $2}') && npm run kind:apply",
-  "eks:connect": "kubectl config use-context arn:aws:eks:${AWS_REGION}:${AWS_ACCOUNT}:cluster/SearchKubernetes8BEC1CD3-fb8a111e81ac46d998c4d56666e588ba",
-  "eks:apply": "npm run synth && npm run eks:connect && kubectl apply -f dist/catalogsearcheks.k8s.yaml",
-  "eks:redrive": "npm run kind:connect && kubectl delete job $(kubectl get -A jobs | grep redrive | awk '{print $2}') && npm run eks:apply",
+  "kind:apply": "yarn synth && yarn kind:connect && yarn cdk:deploy && kubectl apply -f dist/catalogsearchkind.k8s.yaml",
+  "kind:redrive": "yarn kind:connect && kubectl delete job $(kubectl get -A jobs | grep redrive | awk '{print $2}') && yarn kind:apply",
+  "eks:connect": "aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION} --role-arn arn:aws:iam::${AWS_ACCOUNT}:role/construct-catalog-search-SearchClusterAdminEDCBE1-SCTQDMYR4YVB && kubectl config use-context arn:aws:eks:${AWS_REGION}:${AWS_ACCOUNT}:cluster/${EKS_CLUSTER_NAME}",
+  "eks:apply": "yarn synth && yarn eks:connect && kubectl apply -f dist/catalogsearcheks.k8s.yaml",
+  "eks:redrive": "yarn eks:connect && kubectl delete job $(kubectl get -A jobs | grep redrive | awk '{print $2}') && yarn eks:apply",
   "kube:dashboard-token": "kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep adminuser | awk '{print $1}')",
   "kube:elastic-password": "kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}'",
   "kube:elastic-logs": "kubectl logs $(kubectl get -A pods | grep elasticsearch | awk '{print $2}')",
@@ -50,7 +50,7 @@ project.addScripts({
   "kube:redrive-logs": "kubectl logs $(kubectl get -A pods | grep redrive | awk '{print $2}')",
   "kube:wait": "kubectl --all-namespaces --all=true wait --for=condition=Ready pod --timeout=5m",
   "kube:proxy": "kubectl proxy",
-  "kube:dashboard": "npm run kube:dashboard-token && npm run kube:proxy",
+  "kube:dashboard": "yarn kube:dashboard-token && yarn kube:proxy",
   "cdk:deploy": "cdk deploy -a ./cdk.out",
   "build": "yarn compile && yarn test" // no need to package
 });
