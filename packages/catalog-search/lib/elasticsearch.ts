@@ -1,13 +1,13 @@
 import { Construct, Node } from 'constructs';
 import * as cdk8s from 'cdk8s';
 import * as eck from '../imports/elasticsearch.k8s.elastic.co/elasticsearch';
-import * as stdk8s from 'cdk8s-plus';
+import * as kplus from 'cdk8s-plus';
 
 
 export class Elasticsearch extends Construct {
 
   private cr: eck.Elasticsearch;
-  private readonly secret: stdk8s.ISecret;
+  private readonly _secret: kplus.ISecret;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -55,7 +55,7 @@ export class Elasticsearch extends Construct {
       },
     })
 
-    this.secret = stdk8s.Secret.fromSecretName('elasticsearch-es-elastic-user');
+    this._secret = kplus.Secret.fromSecretName('elasticsearch-es-elastic-user');
 
     Node.of(this.cr).addDependency(crd);
 
@@ -73,8 +73,8 @@ export class Elasticsearch extends Construct {
     return 'http://elasticsearch-es-http:9200'
   }
 
-  public get password(): stdk8s.EnvValue {
-    return stdk8s.EnvValue.fromSecret(this.secret, 'elastic');
+  public get password(): kplus.EnvValue {
+    return kplus.EnvValue.fromSecret(this._secret, 'elastic');
   }
 
 }
