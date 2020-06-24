@@ -49,19 +49,16 @@ export class Indexer extends Construct {
       exclude: [ '*.ts' ],
     });
 
-    const entrypointVolume = kplus.Volume.fromConfigMap(app);
+    container.mount(entrypointPath, kplus.Volume.fromConfigMap(app));
 
-    container.mount(entrypointPath, entrypointVolume);
-
-    const d = new kplus.Deployment(this, 'Deployment', {
+    new kplus.Deployment(this, 'Deployment', {
       spec: {
         replicas: 1,
         podSpecTemplate: {
+          containers: [container],
           serviceAccount: props.awsServiceAccont,
         },
       },
     });
-
-    d.spec.podSpecTemplate.addContainer(container);
   }
 }
