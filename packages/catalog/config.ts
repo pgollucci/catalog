@@ -24,5 +24,8 @@ export const prod: CatalogStackProps = {
   env: {
     account: '499430655523',
     region: 'us-east-1',
-  }
+  },
+  externalAccountSubscribers: [
+    "536309290949"  // so matthew.bonig@gmail.com can auto-build his constructs when new versions of `core` are released.
+  ]
 };
