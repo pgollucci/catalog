@@ -55,10 +55,14 @@ export function fromDynamoItem(dynamoItem: aws.DynamoDB.AttributeMap): Package {
   const metadataText = dynamoItem[PackageTableAttributes.METADATA]?.S;
   if (!metadataText) { throw new Error(`invalid schema: attribute ${PackageTableAttributes.METADATA} is expected`); }
 
+  const majorS = dynamoItem[PackageTableAttributes.MAJOR]?.N;
+  const major = majorS ? parseInt(majorS) : undefined;
+
   return {
     name: name,
     version: version,
     metadata: JSON.parse(metadataText),
+    major,
     tweetid: dynamoItem[PackageTableAttributes.TWEETID]?.S,
     url: dynamoItem[PackageTableAttributes.URL]?.S,
     json: dynamoItem[PackageTableAttributes.JSON]?.S,

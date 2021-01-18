@@ -22,6 +22,10 @@ export class Latest extends Construct {
         name: PackageTableAttributes.NAME,
         type: dynamodb.AttributeType.STRING
       },
+      sortKey: {
+        name: PackageTableAttributes.MAJOR,
+        type: dynamodb.AttributeType.NUMBER
+      },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       stream: dynamodb.StreamViewType.NEW_IMAGE,
     });

@@ -1,5 +1,5 @@
 import { DynamoDB } from 'aws-sdk';
-import { fromDynamoItem } from './lambda-util';
+import { fromDynamoItem, PackageTableAttributes } from './lambda-util';
 import { renderComparableVersion } from './version-util'
 
 const ddb = new DynamoDB();
@@ -17,7 +17,7 @@ export async function handler(event: AWSLambda.DynamoDBStreamEvent): Promise<voi
 
     const item = fromDynamoItem(record.dynamodb.NewImage);
 
-    const comparableVersion = renderComparableVersion(record.dynamodb.NewImage.version.S);
+    const { comparableVersion, majorVersion } = renderComparableVersion(record.dynamodb.NewImage.version.S);
 
     // delete the "json" key to reduce bloat
     delete record.dynamodb?.NewImage?.json;
@@ -31,6 +31,7 @@ export async function handler(event: AWSLambda.DynamoDBStreamEvent): Promise<voi
       TableName: TABLE_NAME,
       Item: {
         ...record.dynamodb.NewImage,
+        [PackageTableAttributes.MAJOR]: { N: majorVersion.toString() },
         $comparableVersion: { S: comparableVersion },
       },
       ExpressionAttributeNames: { 

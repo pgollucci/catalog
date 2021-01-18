@@ -1,5 +1,6 @@
 export const enum PackageTableAttributes {
   NAME = 'name',
+  MAJOR = 'major',
   VERSION = 'version',
   METADATA = 'metadata',
   URL = 'url',
@@ -7,12 +8,33 @@ export const enum PackageTableAttributes {
   JSON = 'json'
 }
 
+/**
+ * The contents of the `index/packages.json` file.
+ */
+ export interface PackageDirectory {
+  /** The list of indexed packages */
+  packages: Package[];
+}
+
+/**
+ * Information about one npm packag. There may be multiple dentries with the
+ * same `name` attribute, each corresponding to a distinct major release line
+ * of that package (according to the `major` attribute).
+ */
 export interface Package {
+  /** The name of the package in npm */
   name: string;
+  /** The latest version of this release line */
   version: string;
+  /** The major version of this release line */
+  major?: number;
+  /** Package metadata useful for GUI */
   metadata: PackageMetadata;
-  json?: any; // contents of package.json (only available after rendering)
+  /** Contents of package.json (only available after rendering) */
+  json?: any; 
+  /** The URL to the detail page for this package in the Constructs catalog */
   url?: string;
+  /** The ID of the tweet that announced this release on Twitter.com */
   tweetid?: string;
 }
 
