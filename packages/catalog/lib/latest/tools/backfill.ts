@@ -18,14 +18,14 @@ async function main() {
     const result = await ddb.scan(scanInput).promise();
     if (result.Items != null) {
       const records: AWSLambda.DynamoDBRecord[] = result.Items
-        .filter((item) => !item?.name?.S?.startsWith('@aws-cdk/'))
-        .map((item) => ({
+        .filter(item => !item?.name?.S?.startsWith('@aws-cdk/'))
+        .map(item => ({
           dynamodb: {
-            NewImage: {...(item as any), json: undefined } as { [key: string]: AWSLambda.AttributeValue },
+            NewImage: item as { [key: string]: AWSLambda.AttributeValue },
             StreamViewType: 'NEW_IMAGE'
           },
           eventName: 'INSERT',
-        }));
+        } as AWSLambda.DynamoDBRecord));
 
       await ingestBatch(records);
     }
@@ -34,6 +34,11 @@ async function main() {
 }
 
 async function ingestBatch(records: readonly AWSLambda.DynamoDBRecord[]) {
+  if (records.length === 0) {
+    console.error('no records in batch');
+    return;
+  }
+
   const payload: AWSLambda.DynamoDBStreamEvent = {
     Records: Array.from(records)
   };
@@ -43,7 +48,10 @@ async function ingestBatch(records: readonly AWSLambda.DynamoDBRecord[]) {
     Payload: JSON.stringify(payload),
   }).promise();
 
-  console.error(JSON.stringify(payload, undefined, 2));
+  for (const r of payload.Records) {
+    console.error(`${r.dynamodb?.NewImage?.name?.S} ${r.dynamodb?.NewImage?.version?.S}`);
+  }
+
   console.error(`RESULT: ${result.StatusCode}`);
 }
 

@@ -1,4 +1,6 @@
 import { DynamoDB } from 'aws-sdk';
+import { fromDynamoItem } from './lambda-util';
+import { renderComparableVersion } from './version-util'
 
 const ddb = new DynamoDB();
 const TABLE_NAME = process.env.TABLE_NAME;
@@ -8,19 +10,47 @@ export async function handler(event: AWSLambda.DynamoDBStreamEvent): Promise<voi
     throw new Error('TABLE_NAME is required');
   }
   
-  console.log(`TABLE_NAME: ${TABLE_NAME}`);
-  console.log(`EVENT: ${JSON.stringify(event, null, 2)}`);
-
   for (const record of event.Records ?? []) {
-    if (!record.dynamodb?.NewImage) {
+    if (!record.dynamodb?.NewImage || !record.dynamodb.NewImage.version?.S) {
       continue;
     }
 
+    const item = fromDynamoItem(record.dynamodb.NewImage);
+
+    const comparableVersion = renderComparableVersion(record.dynamodb.NewImage.version.S);
+
+    // delete the "json" key to reduce bloat
+    delete record.dynamodb?.NewImage?.json;
+
+    console.log(JSON.stringify({ record }, undefined, 2));
+    console.log(JSON.stringify({ item }, undefined, 2));
+    
+    const fullname = `${item.name}@${item.version}`;
+
     const putItem: DynamoDB.PutItemInput = {
       TableName: TABLE_NAME,
-      Item: record.dynamodb.NewImage,
+      Item: {
+        ...record.dynamodb.NewImage,
+        $comparableVersion: { S: comparableVersion },
+      },
+      ExpressionAttributeNames: { 
+        '#version': '$comparableVersion'
+      },
+      ExpressionAttributeValues: {
+        ':version': { S: comparableVersion },
+      },
+      ConditionExpression: 'attribute_not_exists(#version) OR #version <= :version',
     };
 
-    await ddb.putItem(putItem).promise();
+    try {
+      await ddb.putItem(putItem).promise();
+      console.log(`new version: ${fullname} (updated)`);
+    } catch (e) {
+      if (e.code !== 'ConditionalCheckFailedException') {
+        throw e;
+      } else {
+        console.log(`old version: ${fullname} (skipped)`)
+      }
+    }
   }
 }

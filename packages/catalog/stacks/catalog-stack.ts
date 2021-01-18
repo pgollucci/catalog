@@ -83,7 +83,9 @@ export class CatalogStack extends Stack {
     });
 
     new Latest(this, 'Latest', {
-      allVersions: tweeter.table
+      inputTables: [renderer.table, tweeter.table],
+      snapshotBucket: website.bucket,
+      snapshotKey: `${website.indexObjectPrefix}packages.json`
     });
 
     new Monitoring(this, 'Monitoring', {
