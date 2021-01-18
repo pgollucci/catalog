@@ -1,6 +1,6 @@
 import { DynamoDB } from 'aws-sdk';
-import { fromDynamoItem, PackageTableAttributes } from './lambda-util';
-import { renderComparableVersion } from './version-util'
+import { PackageTableAttributes, fromDynamoItem } from './lambda-util';
+import { renderComparableVersion, renderLanguages } from './version-util'
 
 const ddb = new DynamoDB();
 const TABLE_NAME = process.env.TABLE_NAME;
@@ -9,7 +9,7 @@ export async function handler(event: AWSLambda.DynamoDBStreamEvent): Promise<voi
   if (!TABLE_NAME) {
     throw new Error('TABLE_NAME is required');
   }
-  
+
   for (const record of event.Records ?? []) {
     if (!record.dynamodb?.NewImage || !record.dynamodb.NewImage.version?.S) {
       continue;
@@ -19,12 +19,14 @@ export async function handler(event: AWSLambda.DynamoDBStreamEvent): Promise<voi
 
     const { comparableVersion, majorVersion } = renderComparableVersion(record.dynamodb.NewImage.version.S);
 
+    const languages = renderLanguages(record.dynamodb?.NewImage);
+
     // delete the "json" key to reduce bloat
     delete record.dynamodb?.NewImage?.json;
 
     console.log(JSON.stringify({ record }, undefined, 2));
     console.log(JSON.stringify({ item }, undefined, 2));
-    
+
     const fullname = `${item.name}@${item.version}`;
 
     const putItem: DynamoDB.PutItemInput = {
@@ -32,9 +34,10 @@ export async function handler(event: AWSLambda.DynamoDBStreamEvent): Promise<voi
       Item: {
         ...record.dynamodb.NewImage,
         [PackageTableAttributes.MAJOR]: { N: majorVersion.toString() },
+        [PackageTableAttributes.LANGUAGES]: { S: JSON.stringify(languages) },
         $comparableVersion: { S: comparableVersion },
       },
-      ExpressionAttributeNames: { 
+      ExpressionAttributeNames: {
         '#version': '$comparableVersion'
       },
       ExpressionAttributeValues: {

@@ -41,7 +41,7 @@ export class Latest extends Construct {
     });
 
     for (const inputTable of props.inputTables) {
-      ingestion.addEventSource(new events.DynamoEventSource(inputTable, { 
+      ingestion.addEventSource(new events.DynamoEventSource(inputTable, {
         startingPosition: lambda.StartingPosition.LATEST,
       }));
     }

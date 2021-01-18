@@ -30,6 +30,7 @@
   "dependencies": {
     "@types/fs-extra": "^8.0.1",
     "catalog-frontend": "0.1.0",
+    "catalog-schema": "0.1.0",
     "cdk-docgen": "0.1.0",
     "constructs": "^3.0.3",
     "fs-extra": "^8.1.0",

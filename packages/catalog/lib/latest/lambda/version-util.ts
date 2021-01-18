@@ -1,12 +1,13 @@
+import { DynamoDB } from 'aws-sdk';
 import * as assert from 'assert';
-
+import type { LanguageSupportInformation } from 'catalog-schema';
 
 /**
  * Re-formats a "standard" version string (e.g: "1.2.3-alpha4") into a form that
  * is lexicographically sortable (e.g: "000001.000002.000003.alpha000004").
  *
  * @param version the version to be re-formatted, e.g: "1.2.3-alpha4"
- * 
+ *
  * @returns the re-formatted version, e.g: "000001.000002.000003.alpha000004~"
  */
 export function renderComparableVersion(version: string): ComparableVersionResult {
@@ -24,6 +25,78 @@ export function renderComparableVersion(version: string): ComparableVersionResul
     + '~';
 
   return { comparableVersion, majorVersion: Number.parseInt(parts[0], 10) };
+}
+
+export function renderLanguages(attributes: { [name: string]: DynamoDB.AttributeValue }): LanguageSupportInformation | undefined{
+  const json: PackageJson | undefined = attributes.json?.S ? JSON.parse(attributes.json?.S) : undefined;
+
+  if (!json?.jsii?.targets) {
+    return undefined;
+  }
+
+  const result: LanguageSupportInformation = {
+    typescript: {
+      url: `https://www.npmjs.com/package/${json.name}/v/${json.version}`,
+      npm: {
+        package: json.name,
+      },
+    },
+  };
+
+  if (json.jsii.targets.dotnet) {
+    result.dotnet = {
+      url: `https://www.nuget.org/packages/${json.jsii.targets.dotnet.packageId}/${json.version}${json.jsii.targets.dotnet.versionSuffix ?? ''}`,
+      nuget: json.jsii.targets.dotnet,
+    };
+  }
+
+  if (json.jsii.targets.go) { /* TODO URL?? */ }
+
+  if (json.jsii.targets.java) {
+    result.java = {
+      url: `https://search.maven.org/artifact/${json.jsii.targets.java.maven.groupId}/${json.jsii.targets.java.maven.artifactId}/${json.version}${json.jsii.targets.java.versionSuffix ?? ''}/pom`,
+      maven: json.jsii.targets.java.maven,
+    };
+  }
+
+  if (json.jsii.targets.python) {
+    result.python = {
+      // TODO: Pre-release identifier transformation for PEP-440
+      url: `https://pypi.org/project/${json.jsii.targets.python.distName}/${json.version}/`,
+      pypi: json.jsii.targets.python,
+    };
+  }
+
+  return result;
+}
+
+/** @internal */
+interface PackageJson {
+  name: string;
+  version: string;
+
+  jsii?: {
+    targets?: {
+      dotnet?: {
+        namespace: string;
+        packageId: string;
+        versionSuffix?: string;
+      };
+      go?: {};
+      java?: {
+        package: string;
+        maven: {
+          groupId: string;
+          artifactId: string;
+        };
+        versionSuffix?: string;
+      };
+      python?: {
+        distName: string;
+        module: string;
+      };
+    };
+  };
 }
 
 interface ComparableVersionResult {
