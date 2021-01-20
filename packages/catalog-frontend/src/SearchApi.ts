@@ -14,6 +14,6 @@ export async function getTotalCount(): Promise<number> {
   return fetchJson().then((list: schema.Package[]) => list.length);
 }
 
-function nonFuzzySearch(list: any[], needle: string) {
-  return list.filter(item => JSON.stringify(item).includes(needle));
+function nonFuzzySearch(list: schema.Package[], needle: string) {
+  return list.filter(item => JSON.stringify(item).includes(needle)).sort((a, b) => b.metadata.date.localeCompare(a.metadata.date));
 }
