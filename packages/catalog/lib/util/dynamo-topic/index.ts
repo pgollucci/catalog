@@ -30,6 +30,7 @@ export enum EventType {
  * A queue that is automatically populated with all updates to a DynamoDB table.
  */
 export class DynamoTopic extends sns.Topic {
+
   constructor(scope: Construct, id: string, props: DynamoTopicProps) {
     super(scope, id, props);
 

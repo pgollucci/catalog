@@ -1,4 +1,9 @@
 import { Construct, Stack } from "monocdk-experiment";
+import { Alarm, TreatMissingData } from "monocdk-experiment/aws-cloudwatch";
+import { SnsAction } from "monocdk-experiment/aws-cloudwatch-actions";
+import { Topic } from "monocdk-experiment/aws-sns";
+import { SlackChannelConfiguration } from "monocdk-experiment/aws-chatbot";
+import { ManagedPolicy } from "monocdk-experiment/aws-iam";
 import cloudwatch = require('monocdk-experiment/aws-cloudwatch');
 import s3 = require('monocdk-experiment/aws-s3');
 import dynamodb = require('monocdk-experiment/aws-dynamodb');
@@ -12,6 +17,13 @@ export interface MonitoringProps {
   readonly rendererLogGroup: string;
   readonly indexerLogGroup: string;
   readonly packagesTable: dynamodb.Table;
+  readonly lambdaErrorMetrics: cloudwatch.Metric[];
+  readonly slack?: SlackMonitoringProps;
+}
+
+export interface SlackMonitoringProps {
+  readonly workspaceId: string;
+  readonly channelId: string;
 }
 
 export class Monitoring extends Construct {
@@ -50,6 +62,39 @@ export class Monitoring extends Construct {
       new cloudwatch.GraphWidget({ title: 'Rendered/5m', left: [ props.renderedPerFiveMinutes ] }),
       new cloudwatch.GraphWidget({ title: 'Tweeted/5m', left: [ props.tweetsPerFiveMinutes ] }),
     );
+
+    dashboard.addWidgets(
+      new cloudwatch.GraphWidget({
+        title: 'Lambda Errors',
+        left: props.lambdaErrorMetrics,
+        width: 24
+      })
+    );
+
+    const alarmTopic = new Topic(this, 'alarm-topic', {
+      displayName: 'All Construct Catalog alarm notifications'
+    });
+
+    if (props.slack) {
+      const slackChannelConfiguration = new SlackChannelConfiguration(this, 'slack-notifications', {
+        slackChannelConfigurationName: "construct-catalog",
+        slackWorkspaceId: props.slack.workspaceId,
+        slackChannelId: props.slack.channelId,
+        notificationTopics: [ alarmTopic ],
+      });
+      slackChannelConfiguration.role?.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("CloudWatchReadOnlyAccess"))
+    }
+
+    props.lambdaErrorMetrics.forEach((metric, index)=>{
+      const alarm = new Alarm(this, `alarm-${metric.label}-${index}`, {
+        metric: metric,
+        threshold: 1,
+        evaluationPeriods: 1,
+        treatMissingData: TreatMissingData.NOT_BREACHING,
+        actionsEnabled: true
+      });
+      alarm.addAlarmAction(new SnsAction(alarmTopic));
+    });
   }
 
   private linkToS3Console(bucket: s3.Bucket) {

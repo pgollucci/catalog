@@ -6,10 +6,12 @@ import iam = require('monocdk-experiment/aws-iam');
 import sqs = require('monocdk-experiment/aws-sqs');
 import ec2 = require('monocdk-experiment/aws-ec2');
 import logs = require('monocdk-experiment/aws-logs');
+import cloudwatch = require('monocdk-experiment/aws-cloudwatch');
 
 import { Construct, Duration, FileSystem, SymlinkFollowMode } from 'monocdk-experiment';
 import { AssetOptions } from 'monocdk-experiment/aws-s3-assets';
 import { FollowMode } from 'monocdk-experiment/lib/assets';
+import { Unit } from "monocdk-experiment/aws-cloudwatch";
 
 export interface NodeFunctionProps {
   /**
@@ -220,6 +222,14 @@ export class NodeFunction extends lambda.Function {
       code: lambda.Code.fromAsset(bundleDir, assetOptions),
       runtime,
       timeout,
+    });
+  }
+
+  public get errorMetric(): cloudwatch.Metric {
+    return this.metricErrors({
+      unit: Unit.COUNT,
+      label: `${this.node.scope?.node.id}-${this.node.id}`, // this needs a stable hash
+      period: Duration.minutes(1),
     });
   }
 }

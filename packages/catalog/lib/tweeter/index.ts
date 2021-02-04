@@ -108,7 +108,6 @@ export class Tweeter extends Construct {
       events: [ new sources.SqsEventSource(queue, { batchSize: 1 }) ],
     });
 
-
     props.twitterCredentials?.grantRead(handler);
     table.grantReadWriteData(handler);
     requestQuota.grantDecrement(handler);

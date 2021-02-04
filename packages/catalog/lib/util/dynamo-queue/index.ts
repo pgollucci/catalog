@@ -30,6 +30,7 @@ export enum EventType {
  * A queue that is automatically populated with all updates to a DynamoDB table.
  */
 export class DynamoQueue extends sqs.Queue {
+
   constructor(scope: Construct, id: string, props: DynamoQueueProps) {
     super(scope, id, props);
 
