@@ -17,7 +17,7 @@ export class SearchOnEKS extends cdk8s.Chart {
     new Indexer(this, 'Indexer', {
       elasticsearch: elasticsearch,
       awsResourcesConfig: kplus.ConfigMap.fromConfigMapName('aws-resources'),
-      awsServiceAccont: kplus.ServiceAccount.fromServiceAccountName('search'),
+      awsServiceAccount: kplus.ServiceAccount.fromServiceAccountName('search'),
     });
 
 

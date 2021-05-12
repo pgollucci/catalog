@@ -10,7 +10,7 @@ export interface IndexerProps {
 
   readonly awsCredsSecret?: stdk8s.ISecret;
 
-  readonly awsServiceAccont?: stdk8s.IServiceAccount;
+  readonly awsServiceAccount?: stdk8s.IServiceAccount;
 
 }
 
@@ -57,7 +57,7 @@ export class Indexer extends Construct {
       spec: {
         replicas: 1,
         podSpecTemplate: {
-          serviceAccount: props.awsServiceAccont,
+          serviceAccount: props.awsServiceAccount,
         },
       },
     });
