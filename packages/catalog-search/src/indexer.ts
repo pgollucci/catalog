@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import * as stdk8s from 'cdk8s-plus';
+import * as stdk8s from 'cdk8s-plus-17';
 import { Elasticsearch } from './elasticsearch';
 
 export interface IndexerProps {
@@ -36,7 +36,7 @@ export class Indexer extends Construct {
     if (props.awsCredsSecret) {
 
       function addEnv(key: string) {
-        container.addEnv(key, stdk8s.EnvValue.fromSecret(props.awsCredsSecret!, key));
+        container.addEnv(key, stdk8s.EnvValue.fromSecretValue(props.awsCredsSecret!, key));
       }
 
       addEnv('AWS_ACCESS_KEY_ID');
